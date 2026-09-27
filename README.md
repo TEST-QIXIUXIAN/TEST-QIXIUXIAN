@@ -25,7 +25,17 @@ docker build -t blog-xiu .
 docker run -d -p 8080:80 blog-xiu
 ```
 
-镜像构建时会自动运行 `build.py`，再用 nginx 提供静态文件。
+镜像构建时会自动运行 `build.py`，再用 nginx 提供静态文件。容器默认监听 80 端口，设置环境变量 `PORT` 可以改端口（Render、Railway 会自动设置）。
+
+## 部署到 Render
+
+仓库里的 `render.yaml` 已经配置好（Docker、免费套餐、推送后自动部署）：
+
+1. 用 GitHub 账号登录 https://dashboard.render.com
+2. 点 **New → Blueprint**，选择这个仓库，确认后点 **Apply**
+3. 几分钟后得到 `https://blog-xiu-xxxx.onrender.com` 这样的网址
+
+免费套餐 15 分钟没人访问会休眠，下一次打开需要等几十秒唤醒。
 
 ## 修改内容
 

@@ -14,7 +14,7 @@ python3 -m http.server 8000   # preview at http://localhost:8000 (or open index.
 docker compose up -d --build  # containerized: nginx on http://localhost:8080
 ```
 
-`Dockerfile` is two-stage: `python:3.12-alpine` runs `build.py`, then `nginx:1.27-alpine` serves an explicit list of files copied into `/usr/share/nginx/html` — a new top-level asset must be added to that `COPY` line or it will 404 in the container (GitHub Pages is unaffected). In the cloud container `dockerd` isn't started by default (`dockerd &`), and Docker Hub pulls may hit 429 rate limits; pull via `mirror.gcr.io/library/<image>` and `docker tag` it to the plain name.
+`Dockerfile` is two-stage: `python:3.12-alpine` runs `build.py`, then `nginx:1.27-alpine` serves an explicit list of files copied into `/usr/share/nginx/html` — a new top-level asset must be added to that `COPY` line or it will 404 in the container (GitHub Pages is unaffected). nginx config is `deploy/default.conf.template`, rendered by the nginx image's envsubst at startup so it listens on `$PORT` (default 80; Render/Railway inject their own). Don't add a `[::]` listen line — nginx fails to start on hosts without IPv6. In the cloud container `dockerd` isn't started by default (`dockerd &`), and Docker Hub pulls may hit 429 rate limits; pull via `mirror.gcr.io/library/<image>` and `docker tag` it to the plain name.
 
 Visual check in the cloud container (no Playwright Python package installed; use the bundled headless shell, which honors narrow widths — full `chrome --headless` clamps small window sizes and crops mobile shots):
 
@@ -34,4 +34,4 @@ $H --no-sandbox --hide-scrollbars --window-size=390,1800 --screenshot=out.png fi
 
 ## Deployment
 
-Live on GitHub Pages at https://test-qixiuxian.github.io/TEST-QIXIUXIAN/, served from the root of branch `claude/hi-vxtgib`; every push redeploys. `.nojekyll` disables Jekyll processing.
+Live on GitHub Pages at https://test-qixiuxian.github.io/TEST-QIXIUXIAN/, served from the root of branch `claude/hi-vxtgib`; every push redeploys. `.nojekyll` disables Jekyll processing. `render.yaml` is a Render Blueprint deploying the Docker image (free plan, same branch, auto-deploy on push).

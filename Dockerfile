@@ -10,4 +10,8 @@ FROM nginx:1.27-alpine
 COPY --from=build /site/index.html /site/style.css /site/script.js /site/feed.xml \
      /site/favicon.svg /site/apple-touch-icon.png /site/og.png /usr/share/nginx/html/
 COPY --from=build /site/posts /usr/share/nginx/html/posts
+# Hosts like Render/Railway pass the listen port in $PORT; the nginx image
+# renders templates/*.template with envsubst (only defined vars) at startup.
+COPY deploy/default.conf.template /etc/nginx/templates/default.conf.template
+ENV PORT=80
 EXPOSE 80

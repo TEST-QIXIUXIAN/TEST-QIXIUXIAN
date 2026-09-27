@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: blog-xiu
+    runtime: docker
+    plan: free
+    branch: claude/hi-vxtgib
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    autoDeploy: true

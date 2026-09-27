@@ -3,3 +3,4 @@
 *.md
 Dockerfile
 docker-compose.yml
+render.yaml

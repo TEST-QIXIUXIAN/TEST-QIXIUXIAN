@@ -11,6 +11,22 @@ python3 -m http.server 8000
 # 访问 http://localhost:8000
 ```
 
+## 用 Docker 运行
+
+```bash
+docker compose up -d --build
+# 访问 http://localhost:8080
+```
+
+或者不用 compose：
+
+```bash
+docker build -t blog-xiu .
+docker run -d -p 8080:80 blog-xiu
+```
+
+镜像构建时会自动运行 `build.py`，再用 nginx 提供静态文件。
+
 ## 修改内容
 
 - `index.html`：简介、文章列表、联系方式

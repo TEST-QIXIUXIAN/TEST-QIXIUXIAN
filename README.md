@@ -1,6 +1,6 @@
-# 个人主页
+# 博客XIU
 
-纯静态个人主页（HTML + CSS + 原生 JS），无需构建。
+XIU 的个人博客，纯静态网站（HTML + CSS + 原生 JS），无需构建。
 
 ## 本地预览
 
@@ -13,9 +13,14 @@ python3 -m http.server 8000
 
 ## 修改内容
 
-- `index.html`：姓名、简介、项目、联系方式（搜索"你的名字"替换）
+- `index.html`：简介、文章列表、联系方式
 - `style.css`：配色在 `:root` 的 CSS 变量里
 - `script.js`：深色/浅色模式切换
+
+## 写新文章
+
+1. 复制 `posts/hello-world.html` 为 `posts/新文章名.html`，修改标题、日期和正文
+2. 在 `index.html` 的 `#posts` 列表最上面加一条 `<li>` 指向它
 
 ## 部署
 

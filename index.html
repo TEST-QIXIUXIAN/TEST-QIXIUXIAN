@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>你的名字 · 个人主页</title>
-  <meta name="description" content="你的名字的个人主页">
+  <title>博客XIU</title>
+  <meta name="description" content="XIU 的个人博客">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="nav">
-    <a class="brand" href="#top">你的名字</a>
+    <a class="brand" href="#top">博客XIU</a>
     <nav>
       <a href="#about">关于</a>
-      <a href="#projects">项目</a>
+      <a href="#posts">文章</a>
       <a href="#contact">联系</a>
       <button id="theme-toggle" type="button" aria-label="切换深色/浅色模式">◐</button>
     </nav>
@@ -20,11 +20,11 @@
 
   <main id="top">
     <section class="hero">
-      <div class="avatar" aria-hidden="true">你</div>
-      <h1>你好，我是<span class="accent">你的名字</span></h1>
-      <p class="tagline">一句话介绍自己，比如：开发者 / 设计师 / 学生，喜欢做有趣的小东西。</p>
+      <div class="avatar" aria-hidden="true">X</div>
+      <h1>你好，我是<span class="accent">XIU</span></h1>
+      <p class="tagline">欢迎来到博客XIU，这里记录我的学习、想法和生活。</p>
       <div class="actions">
-        <a class="btn primary" href="#projects">看看我的项目</a>
+        <a class="btn primary" href="#posts">阅读文章</a>
         <a class="btn" href="#contact">联系我</a>
       </div>
     </section>
@@ -40,39 +40,31 @@
       </ul>
     </section>
 
-    <section id="projects" class="section">
-      <h2>项目</h2>
-      <div class="grid">
-        <article class="card">
-          <h3>项目一</h3>
-          <p>简短描述这个项目做了什么、解决了什么问题。</p>
-          <a href="#">查看 →</a>
-        </article>
-        <article class="card">
-          <h3>项目二</h3>
-          <p>简短描述这个项目做了什么、解决了什么问题。</p>
-          <a href="#">查看 →</a>
-        </article>
-        <article class="card">
-          <h3>项目三</h3>
-          <p>简短描述这个项目做了什么、解决了什么问题。</p>
-          <a href="#">查看 →</a>
-        </article>
-      </div>
+    <section id="posts" class="section">
+      <h2>最新文章</h2>
+      <ul class="post-list">
+        <li>
+          <a class="post-link" href="posts/hello-world.html">
+            <time datetime="2026-09-27">2026-09-27</time>
+            <span class="post-title">你好，博客XIU</span>
+            <span class="post-summary">第一篇文章：为什么开这个博客，以及接下来想写些什么。</span>
+          </a>
+        </li>
+      </ul>
     </section>
 
     <section id="contact" class="section">
       <h2>联系我</h2>
       <p>欢迎交流合作。</p>
       <ul class="links">
-        <li><a href="https://github.com/">GitHub</a></li>
+        <li><a href="https://github.com/TEST-QIXIUXIAN">GitHub</a></li>
         <li><a href="mailto:you@example.com">邮箱</a></li>
       </ul>
     </section>
   </main>
 
   <footer class="footer">
-    <p>© <span id="year"></span> 你的名字</p>
+    <p>© <span id="year"></span> 博客XIU</p>
   </footer>
 
   <script src="script.js"></script>

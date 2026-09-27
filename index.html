@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>你的名字 · 个人主页</title>
+  <meta name="description" content="你的名字的个人主页">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top">你的名字</a>
+    <nav>
+      <a href="#about">关于</a>
+      <a href="#projects">项目</a>
+      <a href="#contact">联系</a>
+      <button id="theme-toggle" type="button" aria-label="切换深色/浅色模式">◐</button>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="avatar" aria-hidden="true">你</div>
+      <h1>你好，我是<span class="accent">你的名字</span></h1>
+      <p class="tagline">一句话介绍自己，比如：开发者 / 设计师 / 学生，喜欢做有趣的小东西。</p>
+      <div class="actions">
+        <a class="btn primary" href="#projects">看看我的项目</a>
+        <a class="btn" href="#contact">联系我</a>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <h2>关于我</h2>
+      <p>在这里写几句关于你的介绍：你在做什么、关心什么、正在学习什么。</p>
+      <ul class="tags">
+        <li>JavaScript</li>
+        <li>Python</li>
+        <li>设计</li>
+        <li>摄影</li>
+      </ul>
+    </section>
+
+    <section id="projects" class="section">
+      <h2>项目</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>项目一</h3>
+          <p>简短描述这个项目做了什么、解决了什么问题。</p>
+          <a href="#">查看 →</a>
+        </article>
+        <article class="card">
+          <h3>项目二</h3>
+          <p>简短描述这个项目做了什么、解决了什么问题。</p>
+          <a href="#">查看 →</a>
+        </article>
+        <article class="card">
+          <h3>项目三</h3>
+          <p>简短描述这个项目做了什么、解决了什么问题。</p>
+          <a href="#">查看 →</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <h2>联系我</h2>
+      <p>欢迎交流合作。</p>
+      <ul class="links">
+        <li><a href="https://github.com/">GitHub</a></li>
+        <li><a href="mailto:you@example.com">邮箱</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> 你的名字</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -19,8 +19,9 @@ python3 -m http.server 8000
 
 ## 写新文章
 
-1. 复制 `posts/hello-world.html` 为 `posts/新文章名.html`，修改标题、日期和正文
-2. 在 `index.html` 的 `#posts` 列表最上面加一条 `<li>` 指向它
+1. 复制 `posts/hello-world.html` 为 `posts/新文章名.html`
+2. 修改 `<head>` 里的 `description`（摘要）、`date`（日期）、`tags`（分类，逗号分隔），以及 `<h1>` 标题和正文
+3. 运行 `python3 build.py`，会自动更新首页文章列表、分类筛选按钮和 RSS（`feed.xml`）
 
 ## 部署
 

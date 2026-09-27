@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-"博客XIU", a static personal blog themed 灵感与感悟 (author persona 诺尔曼) (Chinese-language, `lang="zh-CN"`): plain HTML + CSS + vanilla JS. No build step, package manager, linter, or test suite.
+"博客XIU", a static personal blog themed 灵感与感悟 (author persona 诺尔曼) (Chinese-language, `lang="zh-CN"`): plain HTML + CSS + vanilla JS. No package manager, linter, or test suite; the only build step is `python3 build.py` (stdlib only), whose output is committed.
 
 ## Commands
 
 ```bash
+python3 build.py              # regenerate post list, category filters, per-post tags and feed.xml
 python3 -m http.server 8000   # preview at http://localhost:8000 (or open index.html directly)
 ```
 
@@ -22,9 +23,10 @@ $H --no-sandbox --hide-scrollbars --window-size=390,1800 --screenshot=out.png fi
 ## Structure
 
 - `index.html` — home page; sections `#about`, `#posts`, `#contact` are linked from the sticky nav.
-- `posts/*.html` — one standalone page per article, using `../style.css` and `../script.js` and linking back to `../index.html#…`. There is no generator: adding a post means copying `posts/hello-world.html` and adding a matching `<li>` (newest first) to the `#posts` list in `index.html`; nav/header/footer markup is duplicated across pages and must be edited in each.
+- `posts/*.html` — one standalone page per article, using `../style.css` and `../script.js`. Post metadata lives in `<head>`: `description` (summary), `date` (YYYY-MM-DD), `tags` (comma-separated categories); the title is the first `<h1>`. Nav/header/footer markup is duplicated across pages and must be edited in each.
+- `build.py` — reads that metadata and rewrites everything between `<!-- name:start -->`/`<!-- name:end -->` markers (`filters` and `posts` in `index.html`, `post-tags` in each post) plus `feed.xml`. Never hand-edit inside markers; add a post by copying `posts/hello-world.html`, editing its metadata, then running the build. `SITE_URL` in it must match the Pages URL for RSS links to work.
 - `style.css` — all colors are CSS variables on `:root`. Dark theme is defined twice and both copies must stay in sync: under `@media (prefers-color-scheme: dark)` guarded by `:root:not([data-theme="light"])`, and under `:root[data-theme="dark"]`.
-- `script.js` — footer year, plus the theme toggle: sets `data-theme` on `<html>` and persists it to `localStorage` key `theme` (wrapped in try/catch so it degrades when storage is blocked).
+- `script.js` — footer year, category filter on the home page (matches button `data-tag` against each `<li data-tags>`), plus the theme toggle: sets `data-theme` on `<html>` and persists it to `localStorage` key `theme` (wrapped in try/catch so it degrades when storage is blocked).
 
 ## Deployment
 

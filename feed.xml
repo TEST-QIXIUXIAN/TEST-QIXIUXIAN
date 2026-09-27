@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>博客XIU</title>
+    <link>https://test-qixiuxian.github.io/TEST-QIXIUXIAN/</link>
+    <atom:link href="https://test-qixiuxian.github.io/TEST-QIXIUXIAN/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>灵感与感悟的诺尔曼</description>
+    <language>zh-CN</language>
+    <item>
+      <title>你好，博客XIU</title>
+      <link>https://test-qixiuxian.github.io/TEST-QIXIUXIAN/posts/hello-world.html</link>
+      <guid>https://test-qixiuxian.github.io/TEST-QIXIUXIAN/posts/hello-world.html</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 +0000</pubDate>
+      <description>第一篇：为什么要把灵感和感悟写下来。</description>
+      <category>感悟</category>
+      <category>随笔</category>
+    </item>
+  </channel>
+</rss>

@@ -6,6 +6,7 @@
   <title>博客XIU · 灵感与感悟的诺尔曼</title>
   <meta name="description" content="博客XIU：灵感与感悟的诺尔曼">
   <link rel="stylesheet" href="style.css">
+  <link rel="alternate" type="application/rss+xml" title="博客XIU" href="feed.xml">
 </head>
 <body>
   <header class="nav">
@@ -42,15 +43,26 @@
 
     <section id="posts" class="section">
       <h2>最新文章</h2>
+      <div class="filters" role="group" aria-label="按分类筛选">
+        <!-- filters:start -->
+        <button type="button" data-tag="" aria-pressed="true">全部</button>
+        <button type="button" data-tag="感悟" aria-pressed="false">感悟</button>
+        <button type="button" data-tag="随笔" aria-pressed="false">随笔</button>
+        <!-- filters:end -->
+      </div>
       <ul class="post-list">
-        <li>
+        <!-- posts:start -->
+        <li data-tags="感悟,随笔">
           <a class="post-link" href="posts/hello-world.html">
             <time datetime="2026-09-27">2026-09-27</time>
             <span class="post-title">你好，博客XIU</span>
             <span class="post-summary">第一篇：为什么要把灵感和感悟写下来。</span>
+            <span class="post-tags"><span class="post-tag">感悟</span><span class="post-tag">随笔</span></span>
           </a>
         </li>
+        <!-- posts:end -->
       </ul>
+      <p class="empty" hidden>这个分类下还没有文章。</p>
     </section>
 
     <section id="contact" class="section">
@@ -58,6 +70,7 @@
       <p>如果某句话触动了你，欢迎来聊聊。</p>
       <ul class="links">
         <li><a href="https://github.com/TEST-QIXIUXIAN">GitHub</a></li>
+        <li><a href="feed.xml">RSS 订阅</a></li>
       </ul>
     </section>
   </main>

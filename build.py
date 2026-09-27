@@ -89,9 +89,24 @@ def build_index(posts):
     index.write_text(src, encoding="utf-8")
 
 
-def build_post_tags(posts):
+def og_tags(p):
+    esc = html.escape
+    return "\n".join([
+        '  <meta property="og:type" content="article">',
+        f'  <meta property="og:site_name" content="{esc(SITE_TITLE)}">',
+        f'  <meta property="og:title" content="{esc(p["title"])}">',
+        f'  <meta property="og:description" content="{esc(p["summary"])}">',
+        f'  <meta property="og:url" content="{SITE_URL}{p["path"]}">',
+        f'  <meta property="og:image" content="{SITE_URL}og.png">',
+        f'  <meta property="article:published_time" content="{p["date"]}">',
+        '  <meta name="twitter:card" content="summary_large_image">',
+    ])
+
+
+def build_posts(posts):
     for p in posts:
         src = p["file"].read_text(encoding="utf-8")
+        src = replace_block(src, "og", og_tags(p), "  ")
         src = replace_block(src, "post-tags", f"      <span class=\"post-tags\">{tag_spans(p['tags'])}</span>", "      ")
         p["file"].write_text(src, encoding="utf-8")
 
@@ -132,6 +147,6 @@ def build_feed(posts):
 if __name__ == "__main__":
     posts = load_posts()
     build_index(posts)
-    build_post_tags(posts)
+    build_posts(posts)
     build_feed(posts)
     print(f"built {len(posts)} post(s)")

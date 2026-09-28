@@ -1,6 +1,8 @@
 # 博客XIU
 
-XIU 的个人博客，纯静态网站（HTML + CSS + 原生 JS），无需构建。
+灵感与感悟的诺尔曼 —— 纯静态博客（HTML + CSS + 原生 JS）。
+
+线上地址：https://test-qixiuxian.github.io/TEST-QIXIUXIAN/
 
 ## 本地预览
 
@@ -51,4 +53,4 @@ docker run -d -p 8080:80 blog-xiu
 
 ## 部署
 
-推到 GitHub 后，在仓库 Settings → Pages 选择分支即可用 GitHub Pages 发布。
+网站由 GitHub Pages 从 `claude/hi-vxtgib` 分支根目录发布，推送后 1 分钟左右自动更新。

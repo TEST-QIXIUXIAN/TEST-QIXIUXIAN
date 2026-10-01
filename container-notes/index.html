@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>容器命令速记</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%232563eb'/><path d='M10 34h44l-5 14H15z' fill='white'/><rect x='16' y='24' width='9' height='8' fill='white'/><rect x='27' y='24' width='9' height='8' fill='white'/><rect x='38' y='24' width='9' height='8' fill='white'/><rect x='27' y='14' width='9' height='8' fill='white'/></svg>">
+<style>
+:root{--bg:#f5f6f8;--panel:#fff;--text:#1c2330;--muted:#5f6b7a;--line:#e2e6eb;--accent:#2563eb;--accent-weak:#e9f0ff;--code-bg:#0f172a;--code-text:#e2e8f0;--danger:#c0392b;--mark:#fde68a;--shadow:0 1px 2px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.04)}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#161b22;--text:#e6edf3;--muted:#9aa5b1;--line:#2b323c;--accent:#5b95ff;--accent-weak:#1b2a45;--code-bg:#0a0e14;--code-text:#d7dee8;--danger:#ff7b72;--mark:#6b5a12;--shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 "Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{font-weight:700;font-size:17px;white-space:nowrap;margin-right:8px}
+#q{flex:1;max-width:560px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);outline:none}
+#q:focus,.field:focus{border-color:var(--accent);outline:none}
+.spacer{flex:1}
+.btn{padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08);color:#fff}
+.btn.small{padding:2px 10px;font-size:13px}
+.btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:24px;max-width:1280px;margin:0 auto;padding:20px}
+aside{position:sticky;top:78px;align-self:start;display:flex;flex-direction:column;gap:2px}
+.cat{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 12px;border:0;border-radius:8px;background:none;text-align:left;cursor:pointer}
+.cat:hover{background:var(--accent-weak)}
+.cat.on{background:var(--accent-weak);color:var(--accent);font-weight:600}
+.cat b{font-weight:500;font-size:12px;color:var(--muted)}
+.summary{color:var(--muted);font-size:13px;margin:0 0 10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.card h3{margin:0;font-size:16px;flex:1;min-width:160px}
+.tag{font-size:12px;padding:1px 9px;border-radius:999px;background:var(--accent-weak);color:var(--accent);white-space:nowrap}
+.actions{display:flex;gap:6px}
+pre{margin:10px 0 0;padding:12px 14px;background:var(--code-bg);color:var(--code-text);border-radius:8px;overflow:auto;font:13.5px/1.55 "Cascadia Mono",Consolas,"Courier New",monospace;white-space:pre}
+.note{margin:8px 0 0;color:var(--muted);font-size:14px;white-space:pre-wrap}
+.meta{margin-top:6px;font-size:12px;color:var(--muted)}
+mark{background:var(--mark);color:inherit;border-radius:2px}
+pre mark{background:#b58900;color:#fff}
+.empty{text-align:center;color:var(--muted);padding:60px 0}
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;width:min(760px,94vw);background:var(--panel);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+form.edit{display:flex;flex-direction:column;gap:12px;padding:20px}
+form.edit h2{margin:0;font-size:18px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.field{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px}
+textarea.code{min-height:200px;font-family:"Cascadia Mono",Consolas,"Courier New",monospace;resize:vertical;white-space:pre;tab-size:4}
+.row{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+.foot{display:flex;justify-content:flex-end;gap:8px;align-items:center}
+.foot .hint{margin-right:auto;font-size:12px;color:var(--muted)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f2937;color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.show{opacity:1}
+@media (max-width:760px){header{flex-wrap:wrap}#q{order:9;flex-basis:100%;max-width:none}.layout{grid-template-columns:minmax(0,1fr);padding:16px}aside{position:static;flex-direction:row;flex-wrap:wrap}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">🐳 容器命令速记</div>
+<input id="q" type="search" placeholder="搜索标题、命令、备注…（按 / 快速聚焦）" autocomplete="off">
+<div class="spacer"></div>
+<button class="btn primary" id="add">＋ 新增</button>
+<button class="btn" id="exportMd" title="按分类导出为 Markdown 文档">导出 MD</button>
+<button class="btn" id="exportJson" title="导出为 JSON，可用于备份和导入">导出 JSON</button>
+<button class="btn" id="importBtn" title="导入本程序导出的 JSON（自动跳过重复）">导入</button>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+</header>
+
+<div class="layout">
+<aside id="cats"></aside>
+<main>
+<p class="summary" id="summary"></p>
+<div id="list"><div class="empty">加载中…</div></div>
+</main>
+</div>
+
+<dialog id="dlg">
+<form id="form" class="edit" autocomplete="off">
+<h2 id="formTitle">新增记录</h2>
+<input type="hidden" name="sid">
+<div class="row">
+<label>分类<input class="field" name="category" list="catlist" required maxlength="40" placeholder="选择或输入新分类"></label>
+<label>标题<input class="field" name="title" maxlength="200" placeholder="例如：查看 Pod 日志"></label>
+</div>
+<label>命令 / 代码<textarea class="field code" name="code" spellcheck="false" placeholder="kubectl logs -f &lt;pod名&gt; -n &lt;命名空间&gt;"></textarea></label>
+<label>备注<textarea class="field" name="note" rows="3" placeholder="使用场景、参数说明、注意事项…"></textarea></label>
+<div class="foot"><span class="hint">Ctrl + Enter 保存，Esc 取消</span><button type="button" class="btn" id="cancel">取消</button><button type="submit" class="btn primary">保存</button></div>
+</form>
+</dialog>
+<datalist id="catlist"></datalist>
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+'use strict';
+var ALL = '全部';
+var DEFAULT_CATS = ['Docker', 'Dockerfile', 'Docker Compose', 'Kubernetes', 'Helm', 'Podman', '镜像仓库', '网络与存储', '排障调试', '其他'];
+var items = [], cur = ALL, words = [];
+var $ = function (s) { return document.querySelector(s); };
+var dlg = $('#dlg'), form = $('#form');
+var F = function (n) { return form.elements[n]; };
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+// escape + wrap search hits in <mark>
+function hl(s) {
+  if (!words.length) return esc(s);
+  var re = new RegExp('(' + words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')', 'gi');
+  return String(s).split(re).map(function (p, i) { return i % 2 ? '<mark>' + esc(p) + '</mark>' : esc(p); }).join('');
+}
+function toast(msg) {
+  var t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast.h);
+  toast.h = setTimeout(function () { t.classList.remove('show'); }, 1800);
+}
+function api(path, data) {
+  var opt = data ? {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-Requested-With': 'container-notes' },
+    body: new URLSearchParams(data).toString()
+  } : { cache: 'no-store' };
+  return fetch(path, opt).catch(function () {
+    throw new Error('无法连接本地服务，请确认 container-notes 程序窗口仍在运行');
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (j) {
+      if (!r.ok || j.ok === false) throw new Error(j.error || ('HTTP ' + r.status));
+      return j;
+    });
+  });
+}
+function load() {
+  return api('/api/list').then(function (j) { items = j.items || []; render(); })
+    .catch(function (e) { $('#list').innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; });
+}
+function catInfo() {
+  var counts = {};
+  items.forEach(function (i) { counts[i.category] = (counts[i.category] || 0) + 1; });
+  var extra = Object.keys(counts).filter(function (c) { return DEFAULT_CATS.indexOf(c) < 0; })
+    .sort(function (a, b) { return a.localeCompare(b, 'zh-CN'); });
+  return { counts: counts, cats: DEFAULT_CATS.filter(function (c) { return counts[c]; }).concat(extra) };
+}
+function match(it) {
+  if (cur !== ALL && it.category !== cur) return false;
+  var h = (it.title + '\n' + it.code + '\n' + it.note + '\n' + it.category).toLowerCase();
+  return words.every(function (w) { return h.indexOf(w) >= 0; });
+}
+function fmtTime(ts) {
+  var d = new Date(ts * 1000), p = function (n) { return String(n).padStart(2, '0'); };
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function render() {
+  var ci = catInfo();
+  if (cur !== ALL && !ci.counts[cur]) cur = ALL;
+  $('#cats').innerHTML = [ALL].concat(ci.cats).map(function (c) {
+    return '<button class="cat' + (c === cur ? ' on' : '') + '" data-cat="' + esc(c) + '"><span>' + esc(c) +
+      '</span><b>' + (c === ALL ? items.length : ci.counts[c]) + '</b></button>';
+  }).join('');
+  var all = DEFAULT_CATS.concat(Object.keys(ci.counts).filter(function (c) { return DEFAULT_CATS.indexOf(c) < 0; }));
+  $('#catlist').innerHTML = all.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
+
+  var shown = items.filter(match).sort(function (a, b) { return (b.updated - a.updated) || (a.id - b.id); });
+  $('#summary').textContent = (cur === ALL ? '全部分类' : cur) + ' · ' + shown.length + ' 条' +
+    (words.length ? '（搜索：' + words.join(' ') + '）' : '');
+  if (!shown.length) {
+    $('#list').innerHTML = '<div class="empty">' + (items.length ? '没有匹配的记录' : '还没有记录，点击右上角「＋ 新增」开始收集') + '</div>';
+    return;
+  }
+  $('#list').innerHTML = shown.map(function (it) {
+    return '<article class="card" data-id="' + it.id + '"><div class="card-head"><span class="tag">' + esc(it.category) +
+      '</span><h3>' + hl(it.title || '（无标题）') + '</h3><div class="actions">' +
+      '<button class="btn small" data-act="copy" title="复制命令到剪贴板">复制</button>' +
+      '<button class="btn small" data-act="edit">编辑</button>' +
+      '<button class="btn small danger" data-act="del">删除</button></div></div>' +
+      (it.code ? '<pre><code>' + hl(it.code) + '</code></pre>' : '') +
+      (it.note ? '<p class="note">' + hl(it.note) + '</p>' : '') +
+      (it.updated ? '<div class="meta">更新于 ' + fmtTime(it.updated) + '</div>' : '') + '</article>';
+  }).join('');
+}
+function copy(text) {
+  var fallback = function () {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  };
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).catch(fallback)
+    .then(function () { toast('已复制到剪贴板'); });
+}
+function openForm(it) {
+  form.reset();
+  F('sid').value = it ? it.id : '';
+  F('category').value = it ? it.category : (cur !== ALL ? cur : 'Docker');
+  F('title').value = it ? it.title : '';
+  F('code').value = it ? it.code : '';
+  F('note').value = it ? it.note : '';
+  $('#formTitle').textContent = it ? '编辑记录' : '新增记录';
+  dlg.showModal();
+  F(it ? 'code' : 'title').focus();
+}
+function download(name, text, type) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: type }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+function stamp() {
+  var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+  return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
+}
+
+$('#cats').addEventListener('click', function (e) {
+  var b = e.target.closest('.cat');
+  if (b) { cur = b.dataset.cat; render(); }
+});
+$('#q').addEventListener('input', function (e) {
+  words = e.target.value.toLowerCase().split(/\s+/).filter(Boolean);
+  render();
+});
+$('#list').addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-act]');
+  if (!b) return;
+  var id = +b.closest('.card').dataset.id;
+  var it = items.filter(function (x) { return x.id === id; })[0];
+  if (!it) return;
+  if (b.dataset.act === 'copy') copy(it.code || it.title);
+  else if (b.dataset.act === 'edit') openForm(it);
+  else if (confirm('确定删除「' + (it.title || '无标题') + '」吗？此操作不可撤销。')) {
+    api('/api/delete', { id: id }).then(function () { toast('已删除'); load(); })
+      .catch(function (err) { alert('删除失败：' + err.message); });
+  }
+});
+$('#add').addEventListener('click', function () { openForm(null); });
+$('#cancel').addEventListener('click', function () { dlg.close(); });
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var data = {
+    id: F('sid').value,
+    category: F('category').value.trim() || '其他',
+    title: F('title').value.trim(),
+    code: F('code').value.replace(/\s+$/, ''),
+    note: F('note').value.trim()
+  };
+  if (!data.title && !data.code) { alert('标题和命令至少填写一项'); return; }
+  api('/api/save', data).then(function () { dlg.close(); toast('已保存'); load(); })
+    .catch(function (err) { alert('保存失败：' + err.message); });
+});
+form.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); form.requestSubmit(); }
+});
+document.addEventListener('keydown', function (e) {
+  var tag = document.activeElement && document.activeElement.tagName;
+  if (e.key === '/' && !dlg.open && tag !== 'INPUT' && tag !== 'TEXTAREA') { e.preventDefault(); $('#q').focus(); }
+});
+
+$('#exportJson').addEventListener('click', function () {
+  var out = items.slice().sort(function (a, b) { return a.id - b.id; })
+    .map(function (i) { return { category: i.category, title: i.title, code: i.code, note: i.note }; });
+  download('container-notes-' + stamp() + '.json', JSON.stringify(out, null, 2), 'application/json');
+});
+$('#exportMd').addEventListener('click', function () {
+  var md = '# 容器命令速记\n';
+  catInfo().cats.forEach(function (c) {
+    md += '\n## ' + c + '\n';
+    items.filter(function (i) { return i.category === c; }).sort(function (a, b) { return a.id - b.id; }).forEach(function (i) {
+      md += '\n### ' + (i.title || '（无标题）') + '\n';
+      if (i.code) {
+        var fence = i.code.indexOf('```') >= 0 ? '~~~~' : '```';
+        md += '\n' + fence + '\n' + i.code + '\n' + fence + '\n';
+      }
+      if (i.note) md += '\n' + i.note + '\n';
+    });
+  });
+  download('container-notes-' + stamp() + '.md', md, 'text/markdown');
+});
+$('#importBtn').addEventListener('click', function () { $('#importFile').click(); });
+$('#importFile').addEventListener('change', function (e) {
+  var f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  f.text().then(function (txt) {
+    var list;
+    try { list = JSON.parse(txt); } catch (_) { list = null; }
+    if (!Array.isArray(list)) { alert('文件格式不正确：请选择本程序「导出 JSON」得到的文件'); return; }
+    var seen = {}, added = 0, skipped = 0;
+    items.forEach(function (i) { seen[i.title + '\u0000' + i.code] = 1; });
+    var chain = Promise.resolve();
+    list.forEach(function (r) {
+      if (!r || typeof r !== 'object') return;
+      var d = { category: String(r.category || '其他'), title: String(r.title || ''), code: String(r.code || ''), note: String(r.note || '') };
+      var k = d.title + '\u0000' + d.code;
+      if (!d.title && !d.code) return;
+      if (seen[k]) { skipped++; return; }
+      seen[k] = 1;
+      chain = chain.then(function () { return api('/api/save', d); }).then(function () { added++; });
+    });
+    chain.catch(function (err) { alert('导入中断：' + err.message); })
+      .then(function () { toast('导入 ' + added + ' 条，跳过重复 ' + skipped + ' 条'); load(); });
+  });
+});
+
+load();
+})();
+</script>
+</body>
+</html>

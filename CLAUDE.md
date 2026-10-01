@@ -10,6 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 python3 build.py              # regenerate post list, category filters, per-post tags and feed.xml
+python3 new_post.py "标题" -t 灵感,随笔 -d "摘要"   # scaffold posts/<date>.html from hello-world.html, then build
 python3 -m http.server 8000   # preview at http://localhost:8000 (or open index.html directly)
 docker compose up -d --build  # containerized: nginx on http://localhost:8080
 ```
@@ -27,7 +28,7 @@ $H --no-sandbox --hide-scrollbars --window-size=390,1800 --screenshot=out.png fi
 
 - `index.html` — home page; sections `#about`, `#posts`, `#contact` are linked from the sticky nav.
 - `posts/*.html` — one standalone page per article, using `../style.css` and `../script.js`. Post metadata lives in `<head>`: `description` (summary), `date` (YYYY-MM-DD), `tags` (comma-separated categories); the title is the first `<h1>`. Nav/header/footer markup is duplicated across pages and must be edited in each.
-- `build.py` — reads that metadata and rewrites everything between `<!-- name:start -->`/`<!-- name:end -->` markers (`filters` and `posts` in `index.html`; `og` share-preview meta and `post-tags` in each post) plus `feed.xml`. Never hand-edit inside markers; add a post by copying `posts/hello-world.html`, editing its metadata, then running the build. `SITE_URL` in it must match the Pages URL for RSS and share-preview links to work (the home page's `og:*` tags hardcode the same URL).
+- `build.py` — reads that metadata and rewrites everything between `<!-- name:start -->`/`<!-- name:end -->` markers (`filters` and `posts` in `index.html`; `og` share-preview meta and `post-tags` in each post) plus `feed.xml`. Never hand-edit inside markers; add a post with `new_post.py` (or by copying `posts/hello-world.html`, editing its metadata, then running the build). `new_post.py` rewrites the template with regexes, so if `hello-world.html`'s head/body markup changes, keep its patterns matching. `SITE_URL` in it must match the Pages URL for RSS and share-preview links to work (the home page's `og:*` tags hardcode the same URL).
 - `og.png` (1200×630 share image), `favicon.svg`, `apple-touch-icon.png` — static assets; the PNGs were rendered from HTML with the headless shell, so regenerate them the same way if the name/branding changes.
 - `style.css` — all colors are CSS variables on `:root`. Dark theme is defined twice and both copies must stay in sync: under `@media (prefers-color-scheme: dark)` guarded by `:root:not([data-theme="light"])`, and under `:root[data-theme="dark"]`.
 - `script.js` — footer year, category filter on the home page (matches button `data-tag` against each `<li data-tags>`), plus the theme toggle: sets `data-theme` on `<html>` and persists it to `localStorage` key `theme` (wrapped in try/catch so it degrades when storage is blocked).

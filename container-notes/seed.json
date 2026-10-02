@@ -3916,5 +3916,23 @@
   "title": "oc whoami：查看当前会话信息",
   "code": "# Display the currently authenticated user\noc whoami",
   "note": "官方说明：Return information about the current session"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc kuberc：管理 kuberc 配置文件（命令默认值与别名）",
+  "code": "# View the current kuberc configuration\noc kuberc view\n\n# Set a default value for a command flag\noc kuberc set --section defaults --command get --option output=wide\n\n# Create an alias for a command\noc kuberc set --section aliases --name getn --command get --prependarg nodes --option output=wide",
+  "note": "官方说明：Manage kuberc configuration files"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc kuberc set：在 kuberc 中设置命令默认值或别名",
+  "code": "# Set default output format for 'get' command\noc kuberc set --section defaults --command get --option output=wide\n\n# Set default output format for a subcommand\noc kuberc set --section defaults --command \"set env\" --option output=yaml\n\n# Create an alias 'getn' for 'get' command with prepended 'nodes' resource\noc kuberc set --section aliases --name getn --command get --prependarg nodes --option output=wide\n\n# Create an alias 'runx' for 'run' command with appended arguments\noc kuberc set --section aliases --name runx --command run --option image=nginx --appendarg \"--\" --appendarg custom-arg1\n\n# Overwrite an existing default\noc kuberc set --section defaults --command get --option output=json --overwrite\n\n# Set the credential plugin policy and allowlist\noc kuberc set --section credentialplugin --policy Allowlist --allowlist-entry command=cloud-credential-helper",
+  "note": "官方说明：Set values in the kuberc configuration"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc kuberc view：查看当前 kuberc 配置",
+  "code": "# View kuberc configuration in YAML format (default)\noc kuberc view\n\n# View kuberc configuration in JSON format\noc kuberc view --output json\n\n# View a specific kuberc file\noc kuberc view --kuberc /path/to/kuberc",
+  "note": "官方说明：Display the current kuberc configuration"
  }
 ]

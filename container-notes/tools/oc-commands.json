@@ -117,7 +117,7 @@
   "command": "oc adm must-gather",
   "summary": "Launch a new instance of a pod for gathering debug information",
   "usage": "oc adm must-gather [flags] [options]",
-  "examples": "# Gather information using the default plug-in image and command, writing into ./must-gather.local.<rand>\noc adm must-gather\n\n# Gather information with a specific local folder to copy to\noc adm must-gather --dest-dir=/local/directory\n\n# Gather audit information\noc adm must-gather -- /usr/bin/gather_audit_logs\n\n# Gather information using multiple plug-in images\noc adm must-gather --image=quay.io/kubevirt/must-gather --image=quay.io/openshift/origin-must-gather\n\n# Gather information using a specific image stream plug-in\noc adm must-gather --image-stream=openshift/must-gather:latest\n\n# Gather information using a specific image, command, and pod directory\noc adm must-gather --image=my/image:tag --source-dir=/pod/directory -- myspecial-command.sh"
+  "examples": "# Gather information using the default plug-in image and command, writing into\n# ./must-gather.local.<cluster-id-suffix>.<timestamp(UTC)>.<rand>\n# or ./must-gather.local.<timestamp(UTC)>.<rand> if the cluster ID is unavailable\noc adm must-gather\n\n# Gather information with a specific local folder to copy to\noc adm must-gather --dest-dir=/local/directory\n\n# Gather audit information\noc adm must-gather -- /usr/bin/gather_audit_logs\n\n# Gather information using multiple plug-in images\noc adm must-gather --image=quay.io/kubevirt/must-gather --image=quay.io/openshift/origin-must-gather\n\n# Gather information using a specific image stream plug-in\noc adm must-gather --image-stream=openshift/must-gather:latest\n\n# Gather information using a specific image, command, and pod directory\noc adm must-gather --image=my/image:tag --source-dir=/pod/directory -- myspecial-command.sh"
  },
  {
   "command": "oc adm new-project",
@@ -681,7 +681,7 @@
   "command": "oc create configmap",
   "summary": "Create a config map from a local file, directory or literal value",
   "usage": "oc create configmap NAME [--from-file=[key=]source] [--from-literal=key1=value1] [--dry-run=server|client|none] [options]",
-  "examples": "# Create a new config map named my-config based on folder bar\noc create configmap my-config --from-file=path/to/bar\n\n# Create a new config map named my-config with specified keys instead of file basenames on disk\noc create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt\n\n# Create a new config map named my-config with key1=config1 and key2=config2\noc create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2\n\n# Create a new config map named my-config from the key=value pairs in the file\noc create configmap my-config --from-file=path/to/bar\n\n# Create a new config map named my-config from an env file\noc create configmap my-config --from-env-file=path/to/foo.env --from-env-file=path/to/bar.env"
+  "examples": "# Create a new config map named my-config based on folder bar\noc create configmap my-config --from-file=path/to/bar\n\n# Create a new config map named my-config with specified keys instead of file basenames on disk\noc create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt\n\n# Create a new config map named my-config with key1=config1 and key2=config2\noc create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2\n\n# Create a new config map named my-config with key=value pairs from an env file\noc create configmap my-config --from-env-file=path/to/bar.env"
  },
  {
   "command": "oc create cronjob",
@@ -958,6 +958,24 @@
   "summary": "Import images from a container image registry",
   "usage": "oc import-image IMAGESTREAM[:TAG] [flags] [options]",
   "examples": "# Import tag latest into a new image stream\noc import-image mystream --from=registry.io/repo/image:latest --confirm\n\n# Update imported data for tag latest in an already existing image stream\noc import-image mystream\n\n# Update imported data for tag stable in an already existing image stream\noc import-image mystream:stable\n\n# Update imported data for all tags in an existing image stream\noc import-image mystream --all\n\n# Update imported data for a tag that points to a manifest list to include the full manifest list\noc import-image mystream --import-mode=PreserveOriginal\n\n# Import all tags into a new image stream\noc import-image mystream --from=registry.io/repo/image --all --confirm\n\n# Import all tags into a new image stream using a custom timeout\noc --request-timeout=5m import-image mystream --from=registry.io/repo/image --all --confirm"
+ },
+ {
+  "command": "oc kuberc",
+  "summary": "Manage kuberc configuration files",
+  "usage": "oc kuberc SUBCOMMAND [options]",
+  "examples": "# View the current kuberc configuration\noc kuberc view\n\n# Set a default value for a command flag\noc kuberc set --section defaults --command get --option output=wide\n\n# Create an alias for a command\noc kuberc set --section aliases --name getn --command get --prependarg nodes --option output=wide"
+ },
+ {
+  "command": "oc kuberc set",
+  "summary": "Set values in the kuberc configuration",
+  "usage": "oc kuberc set --section (defaults|aliases) --command COMMAND [options]",
+  "examples": "# Set default output format for 'get' command\noc kuberc set --section defaults --command get --option output=wide\n\n# Set default output format for a subcommand\noc kuberc set --section defaults --command \"set env\" --option output=yaml\n\n# Create an alias 'getn' for 'get' command with prepended 'nodes' resource\noc kuberc set --section aliases --name getn --command get --prependarg nodes --option output=wide\n\n# Create an alias 'runx' for 'run' command with appended arguments\noc kuberc set --section aliases --name runx --command run --option image=nginx --appendarg \"--\" --appendarg custom-arg1\n\n# Overwrite an existing default\noc kuberc set --section defaults --command get --option output=json --overwrite\n\n# Set the credential plugin policy and allowlist\noc kuberc set --section credentialplugin --policy Allowlist --allowlist-entry command=cloud-credential-helper"
+ },
+ {
+  "command": "oc kuberc view",
+  "summary": "Display the current kuberc configuration",
+  "usage": "oc kuberc view [options]",
+  "examples": "# View kuberc configuration in YAML format (default)\noc kuberc view\n\n# View kuberc configuration in JSON format\noc kuberc view --output json\n\n# View a specific kuberc file\noc kuberc view --kuberc /path/to/kuberc"
  },
  {
   "command": "oc kustomize",
@@ -1347,7 +1365,7 @@
   "command": "oc wait",
   "summary": "Wait for a specific condition on one or many resources",
   "usage": "oc wait ([-f FILENAME] | resource.group/resource.name | resource.group [(-l label | --all)]) [--for=create|--for=delete|--for condition=available|--for=jsonpath='{}'[=value]] [options]",
-  "examples": "# Wait for the pod \"busybox1\" to contain the status condition of type \"Ready\"\noc wait --for=condition=Ready pod/busybox1\n\n# The default value of status condition is true; you can wait for other targets after an equal delimiter (compared after Unicode simple case folding, which is a more general form of case-insensitivity)\noc wait --for=condition=Ready=false pod/busybox1\n\n# Wait for the pod \"busybox1\" to contain the status phase to be \"Running\"\noc wait --for=jsonpath='{.status.phase}'=Running pod/busybox1\n\n# Wait for pod \"busybox1\" to be Ready\noc wait --for='jsonpath={.status.conditions[?(@.type==\"Ready\")].status}=True' pod/busybox1\n\n# Wait for the service \"loadbalancer\" to have ingress\noc wait --for=jsonpath='{.status.loadBalancer.ingress}' service/loadbalancer\n\n# Wait for the secret \"busybox1\" to be created, with a timeout of 30s\noc create secret generic busybox1\noc wait --for=create secret/busybox1 --timeout=30s\n\n# Wait for the pod \"busybox1\" to be deleted, with a timeout of 60s, after having issued the \"delete\" command\noc delete pod/busybox1\noc wait --for=delete pod/busybox1 --timeout=60s"
+  "examples": "# Wait for the pod \"busybox1\" to contain the status condition of type \"Ready\"\noc wait --for=condition=Ready pod/busybox1\n\n# The default value of status condition is true; you can wait for other targets after an equal delimiter (compared after Unicode simple case folding, which is a more general form of case-insensitivity)\noc wait --for=condition=Ready=false pod/busybox1\n\n# Wait for the pod \"busybox1\" to contain the status phase to be \"Running\"\noc wait --for=jsonpath='{.status.phase}'=Running pod/busybox1\n\n# Wait for pod \"busybox1\" to be Ready\noc wait --for='jsonpath={.status.conditions[?(@.type==\"Ready\")].status}=True' pod/busybox1\n\n# Wait for the service \"loadbalancer\" to have ingress\noc wait --for=jsonpath='{.status.loadBalancer.ingress}' service/loadbalancer\n\n# Wait for the secret \"busybox1\" to be created, with a timeout of 30s\noc create secret generic busybox1\noc wait --for=create secret/busybox1 --timeout=30s\n\n# Wait for the pod \"busybox1\" to be deleted, with a timeout of 60s, after having issued the \"delete\" command\noc delete pod/busybox1\noc wait --for=delete pod/busybox1 --timeout=60s\n\n# Wait for pod \"busybox1\" to be created AND reach the \"Ready\" status condition\noc wait --for=condition=Ready --for=create pod/busybox1\n\n# Wait for pod \"busybox1\" to reach the \"Ready\" status OR for its containers to report a \"False\" readiness state\nuntil oc wait pod/busybox1 --for=condition=Ready --timeout=1s 2>/dev/null || \\\noc wait pod/busybox1 --for=condition=ContainersReady=False --timeout=1s 2>/dev/null; \\\ndo echo \"Checking conditions...\"; sleep 1; done"
  },
  {
   "command": "oc whoami",

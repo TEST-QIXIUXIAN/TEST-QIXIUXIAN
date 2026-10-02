@@ -4000,5 +4000,11 @@
   "title": "进入指定项目的 Pod（oc rsh -n）",
   "code": "oc rsh -n <项目名> <pod名>\noc rsh -n <项目名> -c <容器名> <pod名>\noc rsh -n <项目名> deployment/<应用名>\noc rsh -n <项目名> --shell=/bin/bash <pod名>\noc rsh -n <项目名> <pod名> cat /etc/resolv.conf",
   "note": "-n、-c、--shell 等参数必须写在 Pod 名前面（官方说明）；默认 shell 是 /bin/sh，有 bash 时可用 --shell=/bin/bash；Pod 名后面跟命令则只执行该命令"
+ },
+ {
+  "category": "排障调试",
+  "title": "报错 exec [POD] [COMMAND] is not supported anymore",
+  "code": "# 错误写法（命令前少了 --）\noc exec -it <pod名> -n <项目名> sh\n\n# 正确写法\noc exec -it <pod名> -n <项目名> -- sh\noc exec -it <pod名> -n <项目名> -c <容器名> -- sh\n\n# 或者用 rsh（不需要 --）\noc rsh -n <项目名> <pod名>",
+  "note": "新版 oc / kubectl 要求用 -- 把要在容器里执行的命令和 oc 自己的参数分开。kubectl exec 同样适用。多容器 Pod 不加 -c 时进入第一个容器"
  }
 ]

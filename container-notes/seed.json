@@ -3934,5 +3934,65 @@
   "title": "oc kuberc view：查看当前 kuberc 配置",
   "code": "# View kuberc configuration in YAML format (default)\noc kuberc view\n\n# View kuberc configuration in JSON format\noc kuberc view --output json\n\n# View a specific kuberc file\noc kuberc view --kuberc /path/to/kuberc",
   "note": "官方说明：Display the current kuberc configuration"
+ },
+ {
+  "category": "OpenShift",
+  "title": "进入容器终端（oc exec -it）",
+  "code": "oc exec -it <pod名> -- /bin/bash\noc exec -it <pod名> -- /bin/sh\noc exec -it <pod名> -c <容器名> -- /bin/sh\noc exec -it <pod名> -n <项目名> -- /bin/sh",
+  "note": "-i 保持输入，-t 分配终端，-it 是两者合写；镜像里没有 bash 时用 /bin/sh；多容器 Pod 用 -c 指定容器。也可以用更短的 oc rsh <pod名>"
+ },
+ {
+  "category": "OpenShift",
+  "title": "在容器中执行单条命令（oc exec）",
+  "code": "oc exec <pod名> -- ls -l /app\noc exec <pod名> -c <容器名> -- env\noc exec deployment/<应用名> -- cat /etc/os-release",
+  "note": "-- 后面是要在容器里执行的命令"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看 Pod（oc get pods）",
+  "code": "oc get pods\noc get pods -o wide\noc get pods -n <项目名> --show-labels\noc get pods -w",
+  "note": "-o wide 显示所在节点和 IP；-w 持续观察；-A 查看所有项目"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看 Pod 详情与事件（oc describe）",
+  "code": "oc describe pod <pod名>\noc describe pod <pod名> -n <项目名>",
+  "note": "重点看最后的 Events"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看项目下的常用资源（oc get all）",
+  "code": "oc get all\noc get all -n <项目名>\noc get svc,route,pvc,cm,secret",
+  "note": "all 不包含 Route、ConfigMap、Secret、PVC，需要单独写"
+ },
+ {
+  "category": "OpenShift",
+  "title": "应用 / 删除 YAML（oc apply / delete）",
+  "code": "oc apply -f app.yaml\noc apply -f ./manifests/ -R\noc delete -f app.yaml\noc delete pod <pod名>",
+  "note": "删除由 Deployment 管理的 Pod 后会自动重建"
+ },
+ {
+  "category": "OpenShift",
+  "title": "以 YAML 查看资源（oc get -o yaml）",
+  "code": "oc get deployment <应用名> -o yaml\noc get route <route名> -o yaml > route.yaml",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "在线编辑资源（oc edit）",
+  "code": "oc edit deployment <应用名>\noc edit route <route名>",
+  "note": "Windows 上可设置环境变量 KUBE_EDITOR=\"notepad\" 或 \"code --wait\""
+ },
+ {
+  "category": "OpenShift",
+  "title": "Pod 与本机之间拷贝文件（oc cp）",
+  "code": "oc cp <pod名>:/app/app.log ./app.log\noc cp ./config.yaml <pod名>:/tmp/config.yaml\noc cp ./a.txt <pod名>:/tmp/a.txt -c <容器名>",
+  "note": "容器内需要有 tar；整个目录同步推荐用 oc rsync"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看服务和路由（oc get svc / route）",
+  "code": "oc get svc\noc get route\noc get route <route名> -o jsonpath=\"{.spec.host}\"",
+  "note": ""
  }
 ]

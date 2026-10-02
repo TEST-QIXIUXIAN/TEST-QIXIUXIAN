@@ -1810,5 +1810,2111 @@
   "title": "查看 Docker Desktop 版本与状态",
   "code": "docker version\ndocker context ls",
   "note": "context 为 desktop-linux 表示使用 Docker Desktop 的 Linux 引擎"
+ },
+ {
+  "category": "OpenShift",
+  "title": "登录集群（用户名密码）",
+  "code": "oc login https://api.<集群域名>:6443 -u <用户名>",
+  "note": "自签名证书环境可加 --insecure-skip-tls-verify=true（仅测试环境）"
+ },
+ {
+  "category": "OpenShift",
+  "title": "登录集群（Token）",
+  "code": "oc login --token=<token> --server=https://api.<集群域名>:6443",
+  "note": "Web 控制台右上角用户名 → Copy login command 可获取"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看当前用户、Token、API 和控制台地址",
+  "code": "oc whoami\noc whoami --show-token\noc whoami --show-server\noc whoami --show-console",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "退出登录",
+  "code": "oc logout",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "新建项目",
+  "code": "oc new-project <项目名> --display-name=\"显示名称\" --description=\"项目说明\"",
+  "note": "OpenShift 的项目（Project）对应 K8s 的命名空间"
+ },
+ {
+  "category": "OpenShift",
+  "title": "切换 / 查看当前项目",
+  "code": "oc project <项目名>\noc project",
+  "note": "不带参数时显示当前项目"
+ },
+ {
+  "category": "OpenShift",
+  "title": "列出项目",
+  "code": "oc projects\noc get projects",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "删除项目",
+  "code": "oc delete project <项目名>",
+  "note": "会删除项目下所有资源，不可恢复"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看项目整体状态",
+  "code": "oc status --suggest",
+  "note": "会给出可能的问题和建议"
+ },
+ {
+  "category": "OpenShift",
+  "title": "从镜像部署应用",
+  "code": "oc new-app --image=<镜像> --name=<应用名>\noc expose service/<应用名>",
+  "note": "自动创建 Deployment 和 Service；expose 再创建 Route 对外访问"
+ },
+ {
+  "category": "OpenShift",
+  "title": "从 Git 源码构建并部署（S2I）",
+  "code": "oc new-app https://github.com/sclorg/nodejs-ex.git --name=nodejs-ex\noc logs -f buildconfig/nodejs-ex",
+  "note": "自动识别语言并选择构建镜像"
+ },
+ {
+  "category": "OpenShift",
+  "title": "指定构建镜像、分支和子目录",
+  "code": "oc new-app nodejs~https://<git地址>.git#<分支> --context-dir=<子目录> --name=<应用名>",
+  "note": "~ 前面是构建镜像（ImageStream），# 后面是分支"
+ },
+ {
+  "category": "OpenShift",
+  "title": "用 Dockerfile 策略构建",
+  "code": "oc new-app https://<git地址>.git --strategy=docker --name=<应用名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "new-app 只预览不创建",
+  "code": "oc new-app --image=<镜像> --name=<应用名> -o yaml",
+  "note": "加 -o yaml 时只输出将要创建的资源"
+ },
+ {
+  "category": "OpenShift",
+  "title": "删除 new-app 创建的全部资源",
+  "code": "oc delete all -l app=<应用名>",
+  "note": "new-app 创建的资源都带有 app=<应用名> 标签；Secret/ConfigMap/PVC 不在 all 中"
+ },
+ {
+  "category": "OpenShift",
+  "title": "从模板创建应用",
+  "code": "oc get templates -n openshift\noc process --parameters -n openshift <模板名>\noc new-app --template=<模板名> -p <参数名>=<值>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "渲染模板后应用",
+  "code": "oc process -f template.yaml -p NAME=myapp | oc apply -f -",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "本地代码二进制构建（不经过 Git）",
+  "code": "oc new-build --binary --strategy=docker --name=<应用名>\noc start-build <应用名> --from-dir=. --follow",
+  "note": "把当前目录上传到集群里构建，适合内网没有 Git 访问的情况"
+ },
+ {
+  "category": "OpenShift",
+  "title": "启动构建并跟随日志",
+  "code": "oc start-build <构建配置名> --follow",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看构建与构建日志",
+  "code": "oc get builds\noc logs -f bc/<构建配置名>\noc logs build/<构建名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "取消构建",
+  "code": "oc cancel-build <构建名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "设置构建后测试钩子",
+  "code": "oc set build-hook bc/<构建配置名> --post-commit --command -- npm test",
+  "note": "测试失败则构建失败"
+ },
+ {
+  "category": "OpenShift",
+  "title": "为构建配置源码拉取密钥",
+  "code": "oc create secret generic git-auth --from-literal=username=<用户名> --from-literal=password=<令牌> --type=kubernetes.io/basic-auth\noc set build-secret --source bc/<构建配置名> git-auth",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "设置镜像变更自动重新部署",
+  "code": "oc set triggers deployment/<应用名> --from-image=<imagestream名>:<标签> -c <容器名>",
+  "note": "ImageStream 标签更新后自动滚动发布"
+ },
+ {
+  "category": "OpenShift",
+  "title": "为 Service 创建 Route",
+  "code": "oc expose service/<服务名>\noc expose service/<服务名> --hostname=<域名>\noc get route",
+  "note": "不指定 hostname 时自动生成 <服务名>-<项目>.apps.<集群域名>"
+ },
+ {
+  "category": "OpenShift",
+  "title": "创建 HTTPS Route（edge）",
+  "code": "oc create route edge <route名> --service=<服务名> --hostname=<域名>\noc create route edge <route名> --service=<服务名> --cert=tls.crt --key=tls.key --ca-cert=ca.crt",
+  "note": "不提供证书时使用路由器默认证书；TLS 在路由器终止"
+ },
+ {
+  "category": "OpenShift",
+  "title": "创建 passthrough Route",
+  "code": "oc create route passthrough <route名> --service=<服务名> --port=8443",
+  "note": "TLS 直接透传到 Pod，由应用自己处理证书"
+ },
+ {
+  "category": "OpenShift",
+  "title": "创建 reencrypt Route",
+  "code": "oc create route reencrypt <route名> --service=<服务名> --dest-ca-cert=service-ca.crt",
+  "note": "路由器终止 TLS 后再用新的 TLS 连接后端"
+ },
+ {
+  "category": "OpenShift",
+  "title": "HTTP 自动跳转 HTTPS",
+  "code": "oc patch route <route名> --type=merge -p '{\"spec\":{\"tls\":{\"termination\":\"edge\",\"insecureEdgeTerminationPolicy\":\"Redirect\"}}}'",
+  "note": "Windows PowerShell 5.1 会吃掉引号，请用 PowerShell 7"
+ },
+ {
+  "category": "OpenShift",
+  "title": "获取 Route 访问地址",
+  "code": "oc get route <route名> -o jsonpath=\"{.spec.host}\"",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "按比例分流（A/B、灰度发布）",
+  "code": "oc set route-backends <route名> <服务A>=90 <服务B>=10\noc set route-backends <route名> --adjust <服务B>=+10%",
+  "note": "权重按比例分配"
+ },
+ {
+  "category": "OpenShift",
+  "title": "Route 超时与负载均衡注解",
+  "code": "oc annotate route <route名> haproxy.router.openshift.io/timeout=120s\noc annotate route <route名> haproxy.router.openshift.io/balance=roundrobin",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "进入 Pod 终端（rsh）",
+  "code": "oc rsh <pod名>\noc rsh deployment/<应用名>",
+  "note": "相当于 oc exec -it ... -- sh"
+ },
+ {
+  "category": "OpenShift",
+  "title": "同步本地目录到 Pod（rsync）",
+  "code": "oc rsync ./src/ <pod名>:/opt/app-root/src\noc rsync <pod名>:/opt/app-root/logs ./logs",
+  "note": "需要容器里有 rsync 或 tar；--watch 可持续同步"
+ },
+ {
+  "category": "OpenShift",
+  "title": "调试启动失败的 Pod",
+  "code": "oc debug deployment/<应用名>\noc debug pod/<pod名> --as-root",
+  "note": "以相同配置启动一个调试副本，入口改为 shell"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看日志",
+  "code": "oc logs -f deployment/<应用名>\noc logs -p <pod名>\noc logs <pod名> -c <容器名>",
+  "note": "-p 查看上一次崩溃前的日志"
+ },
+ {
+  "category": "OpenShift",
+  "title": "端口转发",
+  "code": "oc port-forward <pod名> 8080:8080\noc port-forward service/<服务名> 5432:5432",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "扩缩容与自动扩缩",
+  "code": "oc scale deployment/<应用名> --replicas=3\noc autoscale deployment/<应用名> --min=2 --max=5 --cpu=70%",
+  "note": "旧版 oc 用 --cpu-percent=70"
+ },
+ {
+  "category": "OpenShift",
+  "title": "设置环境变量",
+  "code": "oc set env deployment/<应用名> KEY=value\noc set env deployment/<应用名> --from=secret/<secret名>\noc set env deployment/<应用名> --list\noc set env deployment/<应用名> KEY-",
+  "note": "KEY- 表示删除该变量"
+ },
+ {
+  "category": "OpenShift",
+  "title": "挂载 PVC",
+  "code": "oc set volume deployment/<应用名> --add --name=data --type=pvc --claim-name=<pvc名> --claim-size=1Gi --mount-path=/data",
+  "note": "PVC 不存在且指定了 --claim-size 时会自动创建"
+ },
+ {
+  "category": "OpenShift",
+  "title": "挂载 ConfigMap / Secret",
+  "code": "oc set volume deployment/<应用名> --add --type=configmap --configmap-name=<cm名> --mount-path=/etc/config\noc set volume deployment/<应用名> --add --type=secret --secret-name=<secret名> --mount-path=/etc/secret",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看 / 删除卷",
+  "code": "oc set volume deployment/<应用名>\noc set volume deployment/<应用名> --remove --name=<卷名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "设置健康检查探针",
+  "code": "oc set probe deployment/<应用名> --readiness --get-url=http://:8080/health --initial-delay-seconds=10\noc set probe deployment/<应用名> --liveness --get-url=http://:8080/health --period-seconds=20",
+  "note": "--remove 删除探针"
+ },
+ {
+  "category": "OpenShift",
+  "title": "设置资源 requests / limits",
+  "code": "oc set resources deployment/<应用名> --requests=cpu=100m,memory=256Mi --limits=cpu=500m,memory=512Mi",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "更新镜像",
+  "code": "oc set image deployment/<应用名> <容器名>=<镜像>:<标签>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "指定运行的 ServiceAccount",
+  "code": "oc set serviceaccount deployment/<应用名> <sa名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "发布状态、历史与回滚",
+  "code": "oc rollout status deployment/<应用名>\noc rollout history deployment/<应用名>\noc rollout undo deployment/<应用名>\noc rollout restart deployment/<应用名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "DeploymentConfig 发布与回滚（已弃用）",
+  "code": "oc rollout latest dc/<应用名>\noc rollout retry dc/<应用名>\noc rollback dc/<应用名>",
+  "note": "DeploymentConfig 从 4.14 起弃用，新应用请用 Deployment"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看 ImageStream",
+  "code": "oc get is\noc describe is <imagestream名>\noc get istag",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "导入外部镜像到 ImageStream",
+  "code": "oc import-image <imagestream名>:<标签> --from=<镜像地址> --confirm\noc import-image <imagestream名>:<标签> --from=<镜像地址> --confirm --scheduled",
+  "note": "--scheduled 定期检查外部镜像更新"
+ },
+ {
+  "category": "OpenShift",
+  "title": "给镜像打标签 / 晋级环境",
+  "code": "oc tag <项目A>/<imagestream名>:latest <项目B>/<imagestream名>:prod\noc tag docker.io/library/nginx:1.27 nginx:1.27\noc tag -d <imagestream名>:<标签>",
+  "note": "常用于 dev → test → prod 的镜像晋级；-d 删除标签"
+ },
+ {
+  "category": "OpenShift",
+  "title": "让 Deployment 直接使用 ImageStream 名",
+  "code": "oc set image-lookup <imagestream名>",
+  "note": "之后 Deployment 中 image: <imagestream名>:<标签> 就能解析"
+ },
+ {
+  "category": "OpenShift",
+  "title": "登录集群内部镜像仓库",
+  "code": "oc registry login\noc registry info --public\npodman login -u $(oc whoami) -p $(oc whoami -t) <内部仓库路由地址>",
+  "note": "外部访问需要管理员先开启内部仓库的默认路由"
+ },
+ {
+  "category": "OpenShift",
+  "title": "跨项目拉取镜像授权",
+  "code": "oc policy add-role-to-user system:image-puller system:serviceaccount:<项目A>:default -n <项目B>",
+  "note": "允许项目 A 的 Pod 拉取项目 B 的镜像"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看镜像信息 / 提取文件",
+  "code": "oc image info <镜像>\noc image info <镜像> --filter-by-os=linux/amd64\noc image extract <镜像> --path /etc/os-release:./out --confirm",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "在仓库之间复制镜像",
+  "code": "oc image mirror <源镜像> <目标仓库>/<项目>/<镜像名>:<标签>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "导出 Secret / ConfigMap 内容",
+  "code": "oc extract secret/<secret名> --to=-\noc extract configmap/<cm名> --to=./out",
+  "note": "--to=- 直接打印到屏幕"
+ },
+ {
+  "category": "OpenShift",
+  "title": "修改 Secret / ConfigMap 数据",
+  "code": "oc set data secret/<secret名> --from-file=<键名>=./file\noc set data configmap/<cm名> KEY=value",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "关联拉取密钥到 ServiceAccount",
+  "code": "oc create secret docker-registry regcred --docker-server=<仓库地址> --docker-username=<用户名> --docker-password=<密码>\noc secrets link default regcred --for=pull\noc secrets link builder regcred",
+  "note": "default 用于运行拉镜像，builder 用于构建时拉 / 推镜像"
+ },
+ {
+  "category": "OpenShift",
+  "title": "给用户 / 组授予项目权限",
+  "code": "oc policy add-role-to-user edit <用户名> -n <项目名>\noc policy add-role-to-group view <组名> -n <项目名>\noc policy remove-role-from-user edit <用户名> -n <项目名>",
+  "note": "常用角色：view、edit、admin"
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看谁能执行某操作",
+  "code": "oc adm policy who-can delete pods -n <项目名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "检查当前权限",
+  "code": "oc auth can-i create deployments -n <项目名>\noc auth can-i --list -n <项目名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看 Pod 使用的 SCC",
+  "code": "oc get pod <pod名> -o jsonpath=\"{.metadata.annotations.openshift\\.io/scc}\"",
+  "note": "SCC 决定 Pod 能否以 root、特权、指定 UID 运行"
+ },
+ {
+  "category": "OpenShift",
+  "title": "检查 Pod 能通过哪个 SCC",
+  "code": "oc policy scc-subject-review -f pod.yaml\noc get deployment <应用名> -o yaml | oc policy scc-subject-review -f -",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "项目资源配额与限制",
+  "code": "oc create quota <配额名> --hard=pods=20,requests.cpu=4,requests.memory=8Gi,limits.cpu=8,limits.memory=16Gi -n <项目名>\noc describe quota -n <项目名>\noc describe limitrange -n <项目名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看事件",
+  "code": "oc get events --sort-by=.lastTimestamp\noc events --types=Warning",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "查看 OpenShift 特有资源类型",
+  "code": "oc api-resources --api-group=route.openshift.io\noc api-resources --api-group=build.openshift.io\noc api-resources --api-group=image.openshift.io",
+  "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "oc 自动补全与版本",
+  "code": "source <(oc completion bash)\noc version",
+  "note": "写入 ~/.bashrc 永久生效"
+ },
+ {
+  "category": "OpenShift",
+  "title": "Pod 报 Permission denied（随机 UID）",
+  "code": "oc get pod <pod名> -o jsonpath=\"{.spec.securityContext}\"\noc rsh <pod名> id",
+  "note": "OpenShift 默认用随机 UID、GID=0 运行容器；镜像中需要写入的目录应 chgrp -R 0 并 chmod -R g=u，而不是给 anyuid"
+ },
+ {
+  "category": "OpenShift",
+  "title": "Route 返回 503 排查",
+  "code": "oc get route <route名> -o wide\noc get endpoints <服务名>\noc describe service <服务名>\noc get pods -l <标签>=<值>",
+  "note": "常见原因：Service selector 不匹配、Pod 未就绪、targetPort 写错"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "使用安装生成的 kubeconfig",
+  "code": "export KUBECONFIG=<安装目录>/auth/kubeconfig\noc whoami",
+  "note": "PowerShell：$env:KUBECONFIG=\"<安装目录>\\auth\\kubeconfig\""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看集群版本与升级状态",
+  "code": "oc get clusterversion\noc adm upgrade",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "切换升级通道",
+  "code": "oc adm upgrade channel stable-<版本号>",
+  "note": "例如 stable-4.18；可选通道：stable、fast、candidate、eus"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "升级集群",
+  "code": "oc adm upgrade --to-latest=true\noc adm upgrade --to=<版本号>",
+  "note": "升级前确认所有 ClusterOperator 正常"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看集群 ID",
+  "code": "oc get clusterversion -o jsonpath=\"{.items[0].spec.clusterID}\"",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看集群 Operator 状态",
+  "code": "oc get clusteroperators\noc describe clusteroperator <名称>",
+  "note": "正常时 AVAILABLE=True、PROGRESSING=False、DEGRADED=False"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "等待集群稳定",
+  "code": "oc adm wait-for-stable-cluster --minimum-stable-period=5m",
+  "note": "变更配置或升级后用来确认所有 Operator 都已就绪"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看节点与资源使用",
+  "code": "oc get nodes -o wide\noc adm top nodes\noc adm top pods -A --sort-by=memory",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "节点停止调度 / 驱逐 / 恢复",
+  "code": "oc adm cordon <节点名>\noc adm drain <节点名> --ignore-daemonsets --delete-emptydir-data --force\noc adm uncordon <节点名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "登录节点（debug node）",
+  "code": "oc debug node/<节点名>\nchroot /host",
+  "note": "RHCOS 节点不建议 SSH，用 oc debug 进入后 chroot /host 使用宿主机命令"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "在节点上执行单条命令",
+  "code": "oc debug node/<节点名> -- chroot /host systemctl status kubelet\noc debug node/<节点名> -- chroot /host crictl ps",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看节点服务日志",
+  "code": "oc adm node-logs <节点名> -u kubelet\noc adm node-logs --role=master -u crio\noc adm node-logs <节点名> --path=journal",
+  "note": "--since=-1h 只看最近一小时"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看 API 审计日志",
+  "code": "oc adm node-logs --role=master --path=kube-apiserver/\noc adm node-logs <master节点名> --path=kube-apiserver/audit.log",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "重启节点（安全方式）",
+  "code": "oc adm cordon <节点名>\noc adm drain <节点名> --ignore-daemonsets --delete-emptydir-data --force\noc debug node/<节点名> -- chroot /host shutdown -r +1\noc adm uncordon <节点名>",
+  "note": "节点恢复 Ready 后再 uncordon"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "给节点打角色标签（infra）",
+  "code": "oc label node <节点名> node-role.kubernetes.io/infra=\"\"\noc adm taint nodes <节点名> node-role.kubernetes.io/infra=reserved:NoSchedule",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "审批证书请求（CSR）",
+  "code": "oc get csr\noc adm certificate approve <csr名>",
+  "note": "新节点加入集群时需要审批"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "批量审批所有待处理 CSR",
+  "code": "oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{\"\\n\"}}{{end}}{{end}}' | xargs oc adm certificate approve",
+  "note": "Linux shell 下执行"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看 MachineConfigPool 状态",
+  "code": "oc get mcp\noc get mc\noc describe mcp worker",
+  "note": "修改 MachineConfig 后节点会依次重启"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "暂停 / 恢复 MachineConfigPool",
+  "code": "oc patch mcp worker --type=merge -p '{\"spec\":{\"paused\":true}}'\noc patch mcp worker --type=merge -p '{\"spec\":{\"paused\":false}}'",
+  "note": "暂停期间节点不会应用新配置（也不会重启）"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看 / 扩容 MachineSet",
+  "code": "oc get machinesets -n openshift-machine-api\noc get machines -n openshift-machine-api\noc scale machineset <名称> --replicas=3 -n openshift-machine-api",
+  "note": "仅适用于 IPI 安装等支持 Machine API 的集群"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "收集诊断数据（must-gather）",
+  "code": "oc adm must-gather --dest-dir=./must-gather\noc adm must-gather -- /usr/bin/gather_audit_logs",
+  "note": "提交红帽工单时通常需要"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "收集指定资源的诊断信息",
+  "code": "oc adm inspect clusteroperator/<名称> --dest-dir=./inspect\noc adm inspect ns/<项目名> --dest-dir=./inspect",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "清理旧的构建 / 部署 / 镜像",
+  "code": "oc adm prune builds --orphans --keep-complete=5 --keep-failed=1 --keep-younger-than=60m --confirm\noc adm prune deployments --keep-complete=5 --confirm\noc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m --confirm",
+  "note": "不加 --confirm 只预览；清理镜像需要 system:image-pruner 权限"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "用户组管理",
+  "code": "oc adm groups new <组名> <用户1> <用户2>\noc adm groups add-users <组名> <用户名>\noc adm groups remove-users <组名> <用户名>\noc get groups",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "同步 LDAP 组",
+  "code": "oc adm groups sync --sync-config=ldap-sync.yaml --confirm",
+  "note": "不加 --confirm 只预览"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "授予 / 收回集群角色",
+  "code": "oc adm policy add-cluster-role-to-user cluster-admin <用户名>\noc adm policy add-cluster-role-to-group cluster-reader <组名>\noc adm policy remove-cluster-role-from-user cluster-admin <用户名>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看 / 授予 SCC",
+  "code": "oc get scc\noc adm policy add-scc-to-user anyuid -z <sa名> -n <项目名>\noc adm policy remove-scc-from-user anyuid -z <sa名> -n <项目名>",
+  "note": "-z 表示 ServiceAccount；尽量少用 anyuid / privileged"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看用户与身份",
+  "code": "oc get users\noc get identities\noc delete user <用户名>\noc delete identity <身份名>",
+  "note": "删除用户时要同时删除对应的 identity，否则同名用户无法重新登录"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "配置 HTPasswd 用户",
+  "code": "htpasswd -c -B -b users.htpasswd <用户名> <密码>\noc create secret generic htpass-secret --from-file=htpasswd=users.htpasswd -n openshift-config\noc edit oauth cluster",
+  "note": "oauth 中添加 htpasswd 类型的 identityProvider，引用 htpass-secret"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "增加 / 修改 HTPasswd 用户",
+  "code": "oc extract secret/htpass-secret -n openshift-config --to=. --confirm\nhtpasswd -B -b htpasswd <用户名> <密码>\noc set data secret/htpass-secret --from-file=htpasswd=htpasswd -n openshift-config",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "删除 kubeadmin 临时管理员",
+  "code": "oc delete secret kubeadmin -n kube-system",
+  "note": "先确认已经有其他 cluster-admin 用户能登录，否则无法恢复"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "禁止普通用户自建项目",
+  "code": "oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "自定义新建项目模板",
+  "code": "oc adm create-bootstrap-project-template -o yaml > template.yaml\noc create -f template.yaml -n openshift-config\noc edit project.config.openshift.io/cluster",
+  "note": "在 spec.projectRequestTemplate.name 中填写模板名，可默认附带配额、网络策略"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "管理员创建项目并指定节点",
+  "code": "oc adm new-project <项目名> --node-selector=\"node-role.kubernetes.io/app=\"",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看 Release 信息",
+  "code": "oc adm release info\noc adm release info quay.io/openshift-release-dev/ocp-release:<版本号>-x86_64 --commits\noc adm release info <release镜像> --pullspecs",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "从 Release 镜像提取 oc / 安装程序",
+  "code": "oc adm release extract --command=oc --to=./bin <release镜像>\noc adm release extract --command=openshift-install --to=./bin <release镜像>",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "离线环境镜像同步（oc-mirror）",
+  "code": "oc mirror --config=imageset-config.yaml file://<本地目录> --v2\noc mirror --config=imageset-config.yaml --from=file://<本地目录> docker://<仓库地址> --v2",
+  "note": "oc-mirror 是单独下载的插件；v2 为当前推荐版本"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看镜像源替换配置",
+  "code": "oc get imagedigestmirrorset\noc get imagetagmirrorset\noc adm migrate icsp <icsp文件> --dest-dir=./idms",
+  "note": "旧的 ImageContentSourcePolicy 可用 migrate icsp 转成 IDMS"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "更新全局拉取密钥（pull secret）",
+  "code": "oc get secret/pull-secret -n openshift-config --template='{{index .data \".dockerconfigjson\" | base64decode}}' > pull-secret.json\noc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=pull-secret.json",
+  "note": "编辑 pull-secret.json 加入新的仓库认证后再 set data；会触发节点滚动更新"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "开启内部镜像仓库外部路由",
+  "code": "oc patch configs.imageregistry.operator.openshift.io/cluster --type=merge -p '{\"spec\":{\"defaultRoute\":true}}'\noc get route default-route -n openshift-image-registry",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看内部镜像仓库配置",
+  "code": "oc get configs.imageregistry.operator.openshift.io cluster -o yaml\noc get pods -n openshift-image-registry",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "替换 Ingress 默认证书",
+  "code": "oc create secret tls custom-cert --cert=tls.crt --key=tls.key -n openshift-ingress\noc patch ingresscontroller.operator default -n openshift-ingress-operator --type=merge -p '{\"spec\":{\"defaultCertificate\":{\"name\":\"custom-cert\"}}}'",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "调整路由器（router）副本数",
+  "code": "oc get ingresscontroller -n openshift-ingress-operator\noc patch ingresscontroller default -n openshift-ingress-operator --type=merge -p '{\"spec\":{\"replicas\":3}}'\noc get pods -n openshift-ingress",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "获取 Web 控制台地址",
+  "code": "oc get route console -n openshift-console -o jsonpath=\"{.spec.host}\"\noc whoami --show-console",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看集群网络 / DNS / 代理配置",
+  "code": "oc get network.config cluster -o yaml\noc get dns.operator default -o yaml\noc get proxy cluster -o yaml",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "开启用户项目监控",
+  "code": "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: cluster-monitoring-config\n  namespace: openshift-monitoring\ndata:\n  config.yaml: |\n    enableUserWorkload: true",
+  "note": "保存为文件后 oc apply -f，即可用 ServiceMonitor 监控自己的应用"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看监控组件与告警",
+  "code": "oc get pods -n openshift-monitoring\noc get route -n openshift-monitoring\noc get prometheusrules -A",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "etcd 健康检查",
+  "code": "oc get pods -n openshift-etcd -l app=etcd\noc rsh -n openshift-etcd <etcd-pod名>\netcdctl member list -w table\netcdctl endpoint health --cluster",
+  "note": "后两条在 etcd Pod 内执行"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "etcd 备份",
+  "code": "oc debug node/<master节点名>\nchroot /host\n/usr/local/bin/cluster-backup.sh /home/core/assets/backup",
+  "note": "只需在一个 master 节点上执行；备份文件需拷贝到集群外保存"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看已安装的 Operator",
+  "code": "oc get csv -n <项目名>\noc get subscriptions -A\noc get installplan -n <项目名>",
+  "note": "CSV 状态为 Succeeded 表示安装成功"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "手动批准 Operator 安装计划",
+  "code": "oc patch installplan <installplan名> -n <项目名> --type=merge -p '{\"spec\":{\"approved\":true}}'",
+  "note": "订阅设置为 Manual 审批时需要"
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查找可安装的 Operator",
+  "code": "oc get packagemanifests -n openshift-marketplace\noc describe packagemanifest <operator名> -n openshift-marketplace\noc get catalogsource -n openshift-marketplace",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看构建依赖链",
+  "code": "oc adm build-chain <imagestream名>:<标签> --all",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "查看镜像占用统计",
+  "code": "oc adm top images\noc adm top imagestreams",
+  "note": ""
+ },
+ {
+  "category": "OpenShift 管理",
+  "title": "集群告警 / 异常事件",
+  "code": "oc get events -A --field-selector type=Warning\noc get pods -A | grep -v -E \"Running|Completed\"",
+  "note": "PowerShell 用 Select-String -NotMatch \"Running|Completed\""
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm build-chain：查看构建的输入与依赖链",
+  "code": "# Build the dependency tree for the 'latest' tag in <image-stream>\noc adm build-chain <image-stream>\n\n# Build the dependency tree for the 'v2' tag in dot format and visualize it via the dot utility\noc adm build-chain <image-stream>:v2 -o dot | dot -T svg -o deps.svg\n\n# Build the dependency tree across all namespaces for the specified image stream tag found in the 'test' namespace\noc adm build-chain <image-stream> -n test --all",
+  "note": "官方说明：Output the inputs and dependencies of your builds"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm catalog mirror：镜像同步 Operator 目录（已弃用，建议用 oc-mirror）",
+  "code": "# Mirror an operator-registry image and its contents to a registry\noc adm catalog mirror quay.io/my/image:latest myregistry.com\n\n# Mirror an operator-registry image and its contents to a particular namespace in a registry\noc adm catalog mirror quay.io/my/image:latest myregistry.com/my-namespace\n\n# Mirror to an airgapped registry by first mirroring to files\noc adm catalog mirror quay.io/my/image:latest file:///local/index\noc adm catalog mirror file:///local/index/my/image:latest my-airgapped-registry.com\n\n# Configure a cluster to use a mirrored registry\noc apply -f manifests/imageDigestMirrorSet.yaml\n\n# Edit the mirroring mappings and mirror with \"oc image mirror\" manually\noc adm catalog mirror --manifests-only quay.io/my/image:latest myregistry.com\noc image mirror -f manifests/mapping.txt\n\n# Delete all ImageDigestMirrorSets generated by oc adm catalog mirror\noc delete imagedigestmirrorset -l operators.openshift.org/catalog=true",
+  "note": "官方说明：Mirror an operator-registry catalog"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm certificate approve：批准证书签名请求（CSR）",
+  "code": "# Approve CSR 'csr-sqgzp'\noc adm certificate approve csr-sqgzp",
+  "note": "官方说明：Approve a certificate signing request"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm certificate deny：拒绝证书签名请求（CSR）",
+  "code": "# Deny CSR 'csr-sqgzp'\noc adm certificate deny csr-sqgzp",
+  "note": "官方说明：Deny a certificate signing request"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm copy-to-node：复制文件到节点",
+  "code": "# Copy a new bootstrap kubeconfig file to node-0\noc adm copy-to-node --copy=new-bootstrap-kubeconfig=/etc/kubernetes/kubeconfig node/node-0",
+  "note": "官方说明：Copy specified files to the node"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm cordon：将节点标记为不可调度",
+  "code": "# Mark node \"foo\" as unschedulable\noc adm cordon foo",
+  "note": "官方说明：Mark node as unschedulable"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm create-bootstrap-project-template：生成新建项目模板",
+  "code": "# Output a bootstrap project template in YAML format to stdout\noc adm create-bootstrap-project-template -o yaml",
+  "note": "官方说明：Create a bootstrap project template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm create-error-template：生成登录错误页模板",
+  "code": "# Output a template for the error page to stdout\noc adm create-error-template",
+  "note": "官方说明：Create an error page template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm create-login-template：生成登录页模板",
+  "code": "# Output a template for the login page to stdout\noc adm create-login-template",
+  "note": "官方说明：Create a login template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm create-provider-selection-template：生成身份提供者选择页模板",
+  "code": "# Output a template for the provider selection page to stdout\noc adm create-provider-selection-template",
+  "note": "官方说明：Create a provider selection template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm drain：驱逐节点上的 Pod，准备维护",
+  "code": "# Drain node \"foo\", even if there are pods not managed by a replication controller, replica set, job, daemon set, or stateful set on it\noc adm drain foo --force\n\n# As above, but abort if there are pods not managed by a replication controller, replica set, job, daemon set, or stateful set, and use a grace period of 15 minutes\noc adm drain foo --grace-period=900",
+  "note": "官方说明：Drain node in preparation for maintenance"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm groups add-users：向用户组添加用户",
+  "code": "# Add user1 and user2 to my-group\noc adm groups add-users my-group user1 user2",
+  "note": "官方说明：Add users to a group"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm groups new：创建用户组",
+  "code": "# Add a group with no users\noc adm groups new my-group\n\n# Add a group with two users\noc adm groups new my-group user1 user2\n\n# Add a group with one user and shorter output\noc adm groups new my-group user1 -o name",
+  "note": "官方说明：Create a new group"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm groups prune：清理外部来源（如 LDAP）已不存在的用户组",
+  "code": "# Prune all orphaned groups\noc adm groups prune --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Prune all orphaned groups except the ones from the denylist file\noc adm groups prune --blacklist=/path/to/denylist.txt --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Prune all orphaned groups from a list of specific groups specified in an allowlist file\noc adm groups prune --whitelist=/path/to/allowlist.txt --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Prune all orphaned groups from a list of specific groups specified in a list\noc adm groups prune groups/group_name groups/other_name --sync-config=/path/to/ldap-sync-config.yaml --confirm",
+  "note": "官方说明：Remove old OpenShift groups referencing missing records from an external provider"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm groups remove-users：从用户组移除用户",
+  "code": "# Remove user1 and user2 from my-group\noc adm groups remove-users my-group user1 user2",
+  "note": "官方说明：Remove users from a group"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm groups sync：从外部来源（如 LDAP）同步用户组",
+  "code": "# Sync all groups with an LDAP server\noc adm groups sync --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Sync all groups except the ones from the blacklist file with an LDAP server\noc adm groups sync --blacklist=/path/to/blacklist.txt --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Sync specific groups specified in an allowlist file with an LDAP server\noc adm groups sync --whitelist=/path/to/allowlist.txt --sync-config=/path/to/sync-config.yaml --confirm\n\n# Sync all OpenShift groups that have been synced previously with an LDAP server\noc adm groups sync --type=openshift --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Sync specific OpenShift groups if they have been synced previously with an LDAP server\noc adm groups sync groups/group1 groups/group2 groups/group3 --sync-config=/path/to/sync-config.yaml --confirm",
+  "note": "官方说明：Sync OpenShift groups with records from an external provider"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm inspect：收集指定资源的调试数据",
+  "code": "# Collect debugging data for the \"openshift-apiserver\" clusteroperator\noc adm inspect clusteroperator/openshift-apiserver\n\n# Collect debugging data for the \"openshift-apiserver\" and \"kube-apiserver\" clusteroperators\noc adm inspect clusteroperator/openshift-apiserver clusteroperator/kube-apiserver\n\n# Collect debugging data for all clusteroperators\noc adm inspect clusteroperator\n\n# Collect debugging data for all clusteroperators and clusterversions\noc adm inspect clusteroperators,clusterversions",
+  "note": "官方说明：Collect debugging data for a given resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm migrate icsp：把 ImageContentSourcePolicy 转换为 ImageDigestMirrorSet",
+  "code": "# Update the imagecontentsourcepolicy.yaml file to a new imagedigestmirrorset file under the mydir directory\noc adm migrate icsp imagecontentsourcepolicy.yaml --dest-dir mydir",
+  "note": "官方说明：Update imagecontentsourcepolicy file(s) to imagedigestmirrorset file(s)"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm migrate template-instances：迁移模板实例到最新的资源版本",
+  "code": "# Perform a dry-run of updating all objects\noc adm migrate template-instances\n\n# To actually perform the update, the confirm flag must be appended\noc adm migrate template-instances --confirm",
+  "note": "官方说明：Update template instances to point to the latest group-version-kinds"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm must-gather：收集集群诊断数据（must-gather）",
+  "code": "# Gather information using the default plug-in image and command, writing into ./must-gather.local.<rand>\noc adm must-gather\n\n# Gather information with a specific local folder to copy to\noc adm must-gather --dest-dir=/local/directory\n\n# Gather audit information\noc adm must-gather -- /usr/bin/gather_audit_logs\n\n# Gather information using multiple plug-in images\noc adm must-gather --image=quay.io/kubevirt/must-gather --image=quay.io/openshift/origin-must-gather\n\n# Gather information using a specific image stream plug-in\noc adm must-gather --image-stream=openshift/must-gather:latest\n\n# Gather information using a specific image, command, and pod directory\noc adm must-gather --image=my/image:tag --source-dir=/pod/directory -- myspecial-command.sh",
+  "note": "官方说明：Launch a new instance of a pod for gathering debug information"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm new-project：管理员创建项目（可指定节点选择器）",
+  "code": "# Create a new project using a node selector\noc adm new-project myproject --node-selector='type=user-node,region=east'",
+  "note": "官方说明：Create a new project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm node-image create：生成用于向集群添加节点的 ISO 镜像",
+  "code": "# Create the ISO image and download it in the current folder\noc adm node-image create\n\n# Use a different assets folder\noc adm node-image create --dir=/tmp/assets\n\n# Specify a custom image name\noc adm node-image create -o=my-node.iso\n\n# In place of an ISO, creates files that can be used for PXE boot\noc adm node-image create --pxe\n\n# Create an ISO to add a single node without using the configuration file\noc adm node-image create --mac-address=00:d8:e7:c7:4b:bb\n\n# Create an ISO to add a single node with a root device hint and without\n# using the configuration file\noc adm node-image create --mac-address=00:d8:e7:c7:4b:bb --root-device-hint=deviceName:/dev/sda",
+  "note": "官方说明：Create an ISO image for booting the nodes to be added to the target cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm node-image monitor：监控新节点加入集群的进度",
+  "code": "# Monitor a single node being added to a cluster\noc adm node-image monitor --ip-addresses 192.168.111.83\n\n# Monitor multiple nodes being added to a cluster by separating each\n# IP address with a comma\noc adm node-image monitor --ip-addresses 192.168.111.83,192.168.111.84",
+  "note": "官方说明：Monitor new nodes being added to an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm node-logs：查看和筛选节点日志",
+  "code": "# Show kubelet logs from all control plane nodes\noc adm node-logs --role master -u kubelet\n\n# See what logs are available in control plane nodes in /var/log\noc adm node-logs --role master --path=/\n\n# Display cron log file from all control plane nodes\noc adm node-logs --role master --path=cron",
+  "note": "官方说明：Display and filter node logs"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm ocp-certificates monitor-certificates：监控平台证书",
+  "code": "# Watch platform certificates\noc adm ocp-certificates monitor-certificates",
+  "note": "官方说明：Watch platform certificates"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm ocp-certificates regenerate-leaf：重新生成集群的客户端和服务端证书",
+  "code": "# Regenerate a leaf certificate contained in a particular secret\noc adm ocp-certificates regenerate-leaf -n openshift-config-managed secret/kube-controller-manager-client-cert-key",
+  "note": "官方说明：Regenerate client and serving certificates of an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm ocp-certificates regenerate-machine-config-server-serving-cert：重新生成 Machine Config Server 服务证书",
+  "code": "# Regenerate the MCO certs without modifying user-data secrets\noc adm ocp-certificates regenerate-machine-config-server-serving-cert --update-ignition=false\n\n# Update the user-data secrets to use new MCS certs\noc adm ocp-certificates update-ignition-ca-bundle-for-machine-config-server",
+  "note": "官方说明：Regenerate the machine config operator certificates in an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm ocp-certificates regenerate-top-level：重新生成集群顶级 CA 证书",
+  "code": "# Regenerate the signing certificate contained in a particular secret\noc adm ocp-certificates regenerate-top-level -n openshift-kube-apiserver-operator secret/loadbalancer-serving-signer-key",
+  "note": "官方说明：Regenerate the top level certificates in an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm ocp-certificates remove-old-trust：从信任包中移除旧 CA",
+  "code": "# Remove a trust bundled contained in a particular config map\noc adm ocp-certificates remove-old-trust -n openshift-config-managed configmaps/kube-apiserver-aggregator-client-ca --created-before 2023-06-05T14:44:06Z\n\n#  Remove only CA certificates created before a certain date from all trust bundles\noc adm ocp-certificates remove-old-trust configmaps -A --all --created-before 2023-06-05T14:44:06Z",
+  "note": "官方说明：Remove old CAs from ConfigMaps representing platform trust bundles in an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm ocp-certificates update-ignition-ca-bundle-for-machine-config-server：更新 Ignition 使用的 MCS CA 证书包",
+  "code": "# Regenerate the MCO certs without modifying user-data secrets\noc adm ocp-certificates regenerate-machine-config-server-serving-cert --update-ignition=false\n\n# Update the user-data secrets to use new MCS certs\noc adm ocp-certificates update-ignition-ca-bundle-for-machine-config-server",
+  "note": "官方说明：Update user-data secrets in an OpenShift cluster to use updated MCO certfs"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy add-cluster-role-to-group：给用户组授予集群角色",
+  "code": "# Add the 'cluster-admin' cluster role to the 'cluster-admins' group\noc adm policy add-cluster-role-to-group cluster-admin cluster-admins",
+  "note": "官方说明：Add a role to groups for all projects in the cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy add-cluster-role-to-user：给用户授予集群角色",
+  "code": "# Add the 'system:build-strategy-docker' cluster role to the 'devuser' user\noc adm policy add-cluster-role-to-user system:build-strategy-docker devuser",
+  "note": "官方说明：Add a role to users for all projects in the cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy add-role-to-group：给用户组授予项目角色",
+  "code": "oc adm policy add-role-to-group ROLE GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Add a role to groups for the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy add-role-to-user：给用户或 ServiceAccount 授予项目角色",
+  "code": "# Add the 'view' role to user1 for the current project\noc adm policy add-role-to-user view user1\n\n# Add the 'edit' role to serviceaccount1 for the current project\noc adm policy add-role-to-user edit -z serviceaccount1",
+  "note": "官方说明：Add a role to users or service accounts for the current project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy add-scc-to-group：给用户组授予 SCC",
+  "code": "# Add the 'restricted' security context constraint to group1 and group2\noc adm policy add-scc-to-group restricted group1 group2",
+  "note": "官方说明：Add a security context constraint to groups"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy add-scc-to-user：给用户或 ServiceAccount 授予 SCC",
+  "code": "# Add the 'restricted' security context constraint to user1 and user2\noc adm policy add-scc-to-user restricted user1 user2\n\n# Add the 'privileged' security context constraint to serviceaccount1 in the current namespace\noc adm policy add-scc-to-user privileged -z serviceaccount1",
+  "note": "官方说明：Add a security context constraint to users or a service account"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-cluster-role-from-group：收回用户组的集群角色",
+  "code": "# Remove the 'cluster-admin' cluster role from the 'cluster-admins' group\noc adm policy remove-cluster-role-from-group cluster-admin cluster-admins",
+  "note": "官方说明：Remove a role from groups for all projects in the cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-cluster-role-from-user：收回用户的集群角色",
+  "code": "# Remove the 'system:build-strategy-docker' cluster role from the 'devuser' user\noc adm policy remove-cluster-role-from-user system:build-strategy-docker devuser",
+  "note": "官方说明：Remove a role from users for all projects in the cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-group：从项目中移除用户组",
+  "code": "oc adm policy remove-group GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Remove group from the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-role-from-group：收回用户组的项目角色",
+  "code": "oc adm policy remove-role-from-group ROLE GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Remove a role from groups for the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-role-from-user：收回用户的项目角色",
+  "code": "oc adm policy remove-role-from-user ROLE USER [USER ...] [flags] [options]",
+  "note": "官方说明：Remove a role from users for the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-scc-from-group：收回用户组的 SCC",
+  "code": "oc adm policy remove-scc-from-group SCC GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Remove a group from a security context constraint"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-scc-from-user：收回用户或 ServiceAccount 的 SCC",
+  "code": "oc adm policy remove-scc-from-user SCC USER [USER ...] [flags] [options]",
+  "note": "官方说明：Remove a user from a security context constraint"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy remove-user：从项目中移除用户",
+  "code": "oc adm policy remove-user USER [USER ...] [flags] [options]",
+  "note": "官方说明：Remove user from the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy scc-review：检查哪个 ServiceAccount 能创建该 Pod",
+  "code": "# Check whether service accounts sa1 and sa2 can admit a pod with a template pod spec specified in my_resource.yaml\n# Service Account specified in myresource.yaml file is ignored\noc adm policy scc-review -z sa1,sa2 -f my_resource.yaml\n\n# Check whether service accounts system:serviceaccount:bob:default can admit a pod with a template pod spec specified in my_resource.yaml\noc adm policy scc-review -z system:serviceaccount:bob:default -f my_resource.yaml\n\n# Check whether the service account specified in my_resource_with_sa.yaml can admit the pod\noc adm policy scc-review -f my_resource_with_sa.yaml\n\n# Check whether the default service account can admit the pod; default is taken since no service account is defined in myresource_with_no_sa.yaml\noc adm policy scc-review -f myresource_with_no_sa.yaml",
+  "note": "官方说明：Check which service account can create a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy scc-subject-review：检查用户或 ServiceAccount 能否创建该 Pod",
+  "code": "# Check whether user bob can create a pod specified in myresource.yaml\noc adm policy scc-subject-review -u bob -f myresource.yaml\n\n# Check whether user bob who belongs to projectAdmin group can create a pod specified in myresource.yaml\noc adm policy scc-subject-review -u bob -g projectAdmin -f myresource.yaml\n\n# Check whether a service account specified in the pod template spec in myresourcewithsa.yaml can create the pod\noc adm policy scc-subject-review -f myresourcewithsa.yaml",
+  "note": "官方说明：Check whether a user or a service account can create a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm policy who-can：查看谁能对资源执行某操作",
+  "code": "oc adm policy who-can VERB RESOURCE [NAME] [flags] [options]",
+  "note": "官方说明：List who can perform the specified action on a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune auth：清理已删除角色 / 用户 / 组的引用",
+  "code": "oc adm prune auth [flags] [options]",
+  "note": "官方说明：Removes references to the specified roles, clusterroles, users, and groups"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune builds：清理旧的已完成和失败构建",
+  "code": "# Dry run deleting older completed and failed builds and also including\n# all builds whose associated build config no longer exists\noc adm prune builds --orphans\n\n# To actually perform the prune operation, the confirm flag must be appended\noc adm prune builds --orphans --confirm",
+  "note": "官方说明：Remove old completed and failed builds"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune deployments：清理旧的 DeploymentConfig 部署",
+  "code": "# Dry run deleting all but the last complete deployment for every deployment config\noc adm prune deployments --keep-complete=1\n\n# To actually perform the prune operation, the confirm flag must be appended\noc adm prune deployments --keep-complete=1 --confirm",
+  "note": "官方说明：Remove old completed and failed deployment configs"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune groups：清理外部来源已不存在的用户组",
+  "code": "# Prune all orphaned groups\noc adm prune groups --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Prune all orphaned groups except the ones from the denylist file\noc adm prune groups --blacklist=/path/to/denylist.txt --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Prune all orphaned groups from a list of specific groups specified in an allowlist file\noc adm prune groups --whitelist=/path/to/allowlist.txt --sync-config=/path/to/ldap-sync-config.yaml --confirm\n\n# Prune all orphaned groups from a list of specific groups specified in a list\noc adm prune groups groups/group_name groups/other_name --sync-config=/path/to/ldap-sync-config.yaml --confirm",
+  "note": "官方说明：Remove old OpenShift groups referencing missing records from an external provider"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune images：清理未被引用的镜像",
+  "code": "# See what the prune command would delete if only images and their referrers were more than an hour old\n# and obsoleted by 3 newer revisions under the same tag were considered\noc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m\n\n# To actually perform the prune operation, the confirm flag must be appended\noc adm prune images --keep-tag-revisions=3 --keep-younger-than=60m --confirm\n\n# See what the prune command would delete if we are interested in removing images\n# exceeding currently set limit ranges ('openshift.io/Image')\noc adm prune images --prune-over-size-limit\n\n# To actually perform the prune operation, the confirm flag must be appended\noc adm prune images --prune-over-size-limit --confirm\n\n# Force the insecure HTTP protocol with the particular registry host name\noc adm prune images --registry-url=http://registry.example.org --confirm\n\n# Force a secure connection with a custom certificate authority to the particular registry host name\noc adm prune images --registry-url=registry.example.org --certificate-authority=/path/to/custom/ca.crt --confirm",
+  "note": "官方说明：Remove unreferenced images"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune renderedmachineconfigs：清理渲染出的旧 MachineConfig",
+  "code": "# See what the prune command would delete if run with no options\noc adm prune renderedmachineconfigs\n\n# To actually perform the prune operation, the confirm flag must be appended\noc adm prune renderedmachineconfigs --confirm\n\n# See what the prune command would delete if run on the worker MachineConfigPool\noc adm prune renderedmachineconfigs --pool-name=worker\n\n# Prunes 10 oldest rendered MachineConfigs in the cluster\noc adm prune renderedmachineconfigs --count=10 --confirm\n\n# Prunes 10 oldest rendered MachineConfigs in the cluster for the worker MachineConfigPool\noc adm prune renderedmachineconfigs --count=10 --pool-name=worker --confirm",
+  "note": "官方说明：Prunes rendered MachineConfigs in an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm prune renderedmachineconfigs list：列出渲染出的 MachineConfig",
+  "code": "# List all rendered MachineConfigs for the worker MachineConfigPool in the cluster\noc adm prune renderedmachineconfigs list --pool-name=worker\n\n# List all rendered MachineConfigs in use by the cluster's MachineConfigPools\noc adm prune renderedmachineconfigs list --in-use",
+  "note": "官方说明：Lists rendered MachineConfigs in an OpenShift cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm reboot-machine-config-pool：重启指定 MachineConfigPool 的节点",
+  "code": "# Reboot all MachineConfigPools\noc adm reboot-machine-config-pool mcp/worker mcp/master\n\n# Reboot all MachineConfigPools that inherit from worker.  This include all custom MachineConfigPools and infra.\noc adm reboot-machine-config-pool mcp/worker\n\n# Reboot masters\noc adm reboot-machine-config-pool mcp/master",
+  "note": "官方说明：Initiate reboot of the specified MachineConfigPool"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm release extract：从 Release 镜像中提取内容（oc、安装程序等）",
+  "code": "# Use git to check out the source code for the current cluster release to DIR\noc adm release extract --git=DIR\n\n# Extract cloud credential requests for AWS\noc adm release extract --credentials-requests --cloud=aws\n\n# Use git to check out the source code for the current cluster release to DIR from linux/s390x image\n# Note: Wildcard filter is not supported; pass a single os/arch to extract\noc adm release extract --git=DIR quay.io/openshift-release-dev/ocp-release:4.11.2 --filter-by-os=linux/s390x",
+  "note": "官方说明：Extract the contents of an update payload to disk"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm release info：查看 Release 版本信息",
+  "code": "# Show information about the cluster's current release\noc adm release info\n\n# Show the source code that comprises a release\noc adm release info 4.11.2 --commit-urls\n\n# Show the source code difference between two releases\noc adm release info 4.11.0 4.11.2 --commits\n\n# Show where the images referenced by the release are located\noc adm release info quay.io/openshift-release-dev/ocp-release:4.11.2 --pullspecs\n\n# Show information about linux/s390x image\n# Note: Wildcard filter is not supported; pass a single os/arch to extract\noc adm release info quay.io/openshift-release-dev/ocp-release:4.11.2 --filter-by-os=linux/s390x",
+  "note": "官方说明：Display information about a release"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm release new：创建新的 OpenShift Release",
+  "code": "# Create a release from the latest origin images and push to a DockerHub repository\noc adm release new --from-image-stream=4.11 -n origin --to-image docker.io/mycompany/myrepo:latest\n\n# Create a new release with updated metadata from a previous release\noc adm release new --from-release registry.ci.openshift.org/origin/release:v4.11 --name 4.11.1 \\\n--previous 4.11.0 --metadata ... --to-image docker.io/mycompany/myrepo:latest\n\n# Create a new release and override a single image\noc adm release new --from-release registry.ci.openshift.org/origin/release:v4.11 \\\ncli=docker.io/mycompany/cli:latest --to-image docker.io/mycompany/myrepo:latest\n\n# Run a verification pass to ensure the release can be reproduced\noc adm release new --from-release registry.ci.openshift.org/origin/release:v4.11",
+  "note": "官方说明：Create a new OpenShift release"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm restart-kubelet：重启指定节点的 kubelet",
+  "code": "# Restart all the nodes, 10% at a time\noc adm restart-kubelet nodes --all --directive=RemoveKubeletKubeconfig\n\n# Restart all the nodes, 20 nodes at a time\noc adm restart-kubelet nodes --all --parallelism=20 --directive=RemoveKubeletKubeconfig\n\n# Restart all the nodes, 15% at a time\noc adm restart-kubelet nodes --all --parallelism=15% --directive=RemoveKubeletKubeconfig\n\n# Restart all the masters at the same time\noc adm restart-kubelet nodes -l node-role.kubernetes.io/master --parallelism=100% --directive=RemoveKubeletKubeconfig",
+  "note": "官方说明：Restart kubelet on the specified nodes"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm taint：设置节点污点",
+  "code": "# Update node 'foo' with a taint with key 'dedicated' and value 'special-user' and effect 'NoSchedule'\n# If a taint with that key and effect already exists, its value is replaced as specified\noc adm taint nodes foo dedicated=special-user:NoSchedule\n\n# Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists\noc adm taint nodes foo dedicated:NoSchedule-\n\n# Remove from node 'foo' all the taints with key 'dedicated'\noc adm taint nodes foo dedicated-\n\n# Add a taint with key 'dedicated' on nodes having label myLabel=X\noc adm taint node -l myLabel=X  dedicated=foo:PreferNoSchedule\n\n# Add to node 'foo' a taint with key 'bar' and no value\noc adm taint nodes foo bar:NoSchedule",
+  "note": "官方说明：Update the taints on one or more nodes"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm top images：查看镜像使用统计",
+  "code": "# Show usage statistics for images\noc adm top images",
+  "note": "官方说明：Show usage statistics for images"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm top imagestreams：查看 ImageStream 使用统计",
+  "code": "# Show usage statistics for image streams\noc adm top imagestreams",
+  "note": "官方说明：Show usage statistics for image streams"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm top node：查看节点 CPU / 内存使用",
+  "code": "# Show metrics for all nodes\noc adm top node\n\n# Show metrics for a given node\noc adm top node NODE_NAME",
+  "note": "官方说明：Display resource (CPU/memory) usage of nodes"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm top persistentvolumeclaims：查看 PVC 使用统计（实验性）",
+  "code": "# Show usage statistics for all the bound persistentvolumeclaims across the cluster\noc adm top persistentvolumeclaims -A\n\n# Show usage statistics for all the bound persistentvolumeclaims in a specific namespace\noc adm top persistentvolumeclaims -n default\n\n# Show usage statistics for specific bound persistentvolumeclaims\noc adm top persistentvolumeclaims database-pvc app-pvc -n default",
+  "note": "官方说明：Experimental: Show usage statistics for bound persistentvolumeclaims"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm top pod：查看 Pod CPU / 内存使用",
+  "code": "# Show metrics for all pods in the default namespace\noc adm top pod\n\n# Show metrics for all pods in the given namespace\noc adm top pod --namespace=NAMESPACE\n\n# Show metrics for a given pod and its containers\noc adm top pod POD_NAME --containers\n\n# Show metrics for the pods defined by label name=myLabel\noc adm top pod -l name=myLabel",
+  "note": "官方说明：Display resource (CPU/memory) usage of pods"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm uncordon：恢复节点调度",
+  "code": "# Mark node \"foo\" as schedulable\noc adm uncordon foo",
+  "note": "官方说明：Mark node as schedulable"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm upgrade：升级集群或调整升级通道",
+  "code": "# View the update status and available cluster updates\noc adm upgrade\n\n# Update to the latest version\noc adm upgrade --to-latest=true",
+  "note": "官方说明：Upgrade a cluster or adjust the upgrade channel"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm upgrade channel：设置或清除升级通道",
+  "code": "oc adm upgrade channel CHANNEL [flags] [options]",
+  "note": "官方说明：Set or clear the update channel"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm upgrade recommend：查看集群升级建议",
+  "code": "oc adm upgrade recommend [flags] [options]",
+  "note": "官方说明：Displays cluster update recommendations."
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm upgrade status：查看当前升级进度",
+  "code": "oc adm upgrade status [flags] [options]",
+  "note": "官方说明：Display the status of the current cluster version update or multi-arch migration"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm verify-image-signature：校验镜像签名",
+  "code": "# Verify the image signature and identity using the local GPG keychain\noc adm verify-image-signature sha256:c841e9b64e4579bd56c794bdd7c36e1c257110fd2404bebbb8b613e4935228c4 \\\n--expected-identity=registry.local:5000/foo/bar:v1\n\n# Verify the image signature and identity using the local GPG keychain and save the status\noc adm verify-image-signature sha256:c841e9b64e4579bd56c794bdd7c36e1c257110fd2404bebbb8b613e4935228c4 \\\n--expected-identity=registry.local:5000/foo/bar:v1 --save\n\n# Verify the image signature and identity via exposed registry route\noc adm verify-image-signature sha256:c841e9b64e4579bd56c794bdd7c36e1c257110fd2404bebbb8b613e4935228c4 \\\n--expected-identity=registry.local:5000/foo/bar:v1 \\\n--registry-url=docker-registry.foo.com\n\n# Remove all signature verifications from the image\noc adm verify-image-signature sha256:c841e9b64e4579bd56c794bdd7c36e1c257110fd2404bebbb8b613e4935228c4 --remove-all",
+  "note": "官方说明：Verify the image identity contained in the image signature"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm wait-for-node-reboot：等待节点重启完成",
+  "code": "# Wait for all nodes to complete a requested reboot from 'oc adm reboot-machine-config-pool mcp/worker mcp/master'\noc adm wait-for-node-reboot nodes --all\n\n# Wait for masters to complete a requested reboot from 'oc adm reboot-machine-config-pool mcp/master'\noc adm wait-for-node-reboot nodes -l node-role.kubernetes.io/master\n\n# Wait for masters to complete a specific reboot\noc adm wait-for-node-reboot nodes -l node-role.kubernetes.io/master --reboot-number=4",
+  "note": "官方说明：Wait for nodes to reboot after running `oc adm reboot-machine-config-pool`"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc adm wait-for-stable-cluster：等待平台 Operator 全部稳定",
+  "code": "# Wait for all cluster operators to become stable\noc adm wait-for-stable-cluster\n\n# Consider operators to be stable if they report as such for 5 minutes straight\noc adm wait-for-stable-cluster --minimum-stable-period 5m",
+  "note": "官方说明：Wait for the platform operators to become stable"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc annotate：添加 / 修改注解",
+  "code": "# Update pod 'foo' with the annotation 'description' and the value 'my frontend'\n# If the same annotation is set multiple times, only the last value will be applied\noc annotate pods foo description='my frontend'\n\n# Update a pod identified by type and name in \"pod.json\"\noc annotate -f pod.json description='my frontend'\n\n# Update pod 'foo' with the annotation 'description' and the value 'my frontend running nginx', overwriting any existing value\noc annotate --overwrite pods foo description='my frontend running nginx'\n\n# Update all pods in the namespace\noc annotate pods --all description='my frontend running nginx'\n\n# Update pod 'foo' only if the resource is unchanged from version 1\noc annotate pods foo description='my frontend running nginx' --resource-version=1\n\n# Update pod 'foo' by removing an annotation named 'description' if it exists\n# Does not require the --overwrite flag\noc annotate pods foo description-",
+  "note": "官方说明：Update the annotations on a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc api-resources：列出服务器支持的资源类型",
+  "code": "# Print the supported API resources\noc api-resources\n\n# Print the supported API resources with more information\noc api-resources -o wide\n\n# Print the supported API resources sorted by a column\noc api-resources --sort-by=name\n\n# Print the supported namespaced resources\noc api-resources --namespaced=true\n\n# Print the supported non-namespaced resources\noc api-resources --namespaced=false\n\n# Print the supported API resources with a specific APIGroup\noc api-resources --api-group=rbac.authorization.k8s.io",
+  "note": "官方说明：Print the supported API resources on the server"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc api-versions：列出服务器支持的 API 版本",
+  "code": "# Print the supported API versions\noc api-versions",
+  "note": "官方说明：Print the supported API versions on the server, in the form of \"group/version\""
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc apply：按文件应用配置",
+  "code": "# Apply the configuration in pod.json to a pod\noc apply -f ./pod.json\n\n# Apply resources from a directory containing kustomization.yaml - e.g. dir/kustomization.yaml\noc apply -k dir/\n\n# Apply the JSON passed into stdin to a pod\ncat pod.json | oc apply -f -\n\n# Apply the configuration from all files that end with '.json'\noc apply -f '*.json'\n\n# Note: --prune is still in Alpha\n# Apply the configuration in manifest.yaml that matches label app=nginx and delete all other resources that are not in the file and match label app=nginx\noc apply --prune -f manifest.yaml -l app=nginx\n\n# Apply the configuration in manifest.yaml and delete all the other config maps that are not in the file\noc apply --prune -f manifest.yaml --all --prune-allowlist=core/v1/ConfigMap",
+  "note": "官方说明：Apply a configuration to a resource by file name or stdin"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc apply edit-last-applied：编辑资源的 last-applied 配置",
+  "code": "# Edit the last-applied-configuration annotations by type/name in YAML\noc apply edit-last-applied deployment/nginx\n\n# Edit the last-applied-configuration annotations by file in JSON\noc apply edit-last-applied -f deploy.yaml -o json",
+  "note": "官方说明：Edit latest last-applied-configuration annotations of a resource/object"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc apply set-last-applied：设置资源的 last-applied 配置",
+  "code": "# Set the last-applied-configuration of a resource to match the contents of a file\noc apply set-last-applied -f deploy.yaml\n\n# Execute set-last-applied against each configuration file in a directory\noc apply set-last-applied -f path/\n\n# Set the last-applied-configuration of a resource to match the contents of a file; will create the annotation if it does not already exist\noc apply set-last-applied -f deploy.yaml --create-annotation=true",
+  "note": "官方说明：Set the last-applied-configuration annotation on a live object to match the contents of a file"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc apply view-last-applied：查看资源的 last-applied 配置",
+  "code": "# View the last-applied-configuration annotations by type/name in YAML\noc apply view-last-applied deployment/nginx\n\n# View the last-applied-configuration annotations by file in JSON\noc apply view-last-applied -f deploy.yaml -o json",
+  "note": "官方说明：View the latest last-applied-configuration annotations of a resource/object"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc attach：附加到运行中的容器",
+  "code": "# Get output from running pod mypod; use the 'oc.kubernetes.io/default-container' annotation\n# for selecting the container to be attached or the first container in the pod will be chosen\noc attach mypod\n\n# Get output from ruby-container from pod mypod\noc attach mypod -c ruby-container\n\n# Switch to raw terminal mode; sends stdin to 'bash' in ruby-container from pod mypod\n# and sends stdout/stderr from 'bash' back to the client\noc attach mypod -c ruby-container -i -t\n\n# Get output from the first pod of a replica set named nginx\noc attach rs/nginx",
+  "note": "官方说明：Attach to a running container"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc auth can-i：检查是否有权限执行某操作",
+  "code": "# Check to see if I can create pods in any namespace\noc auth can-i create pods --all-namespaces\n\n# Check to see if I can list deployments in my current namespace\noc auth can-i list deployments.apps\n\n# Check to see if service account \"foo\" of namespace \"dev\" can list pods in the namespace \"prod\"\n# You must be allowed to use impersonation for the global option \"--as\"\noc auth can-i list pods --as=system:serviceaccount:dev:foo -n prod\n\n# Check to see if I can do everything in my current namespace (\"*\" means all)\noc auth can-i '*' '*'\n\n# Check to see if I can get the job named \"bar\" in namespace \"foo\"\noc auth can-i list jobs.batch/bar -n foo\n\n# Check to see if I can read pod logs\noc auth can-i get pods --subresource=log\n\n# Check to see if I can access the URL /logs/\noc auth can-i get /logs/\n\n# Check to see if I can approve certificates.k8s.io\noc auth can-i approve certificates.k8s.io\n\n# List all allowed actions in namespace \"foo\"\noc auth can-i --list --namespace=foo",
+  "note": "官方说明：Check whether an action is allowed"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc auth reconcile：调和 RBAC 角色与绑定",
+  "code": "# Reconcile RBAC resources from a file\noc auth reconcile -f my-rbac-rules.yaml",
+  "note": "官方说明：Reconciles rules for RBAC role, role binding, cluster role, and cluster role binding objects"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc auth whoami：查看当前身份属性（实验性）",
+  "code": "# Get your subject attributes\noc auth whoami\n\n# Get your subject attributes in JSON format\noc auth whoami -o json",
+  "note": "官方说明：Experimental: Check self subject attributes"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc autoscale：创建自动扩缩容（HPA）",
+  "code": "# Auto scale a deployment \"foo\", with the number of pods between 2 and 10, no target CPU utilization specified so a default autoscaling policy will be used\noc autoscale deployment foo --min=2 --max=10\n\n# Auto scale a replication controller \"foo\", with the number of pods between 1 and 5, target CPU utilization at 80%\noc autoscale rc foo --max=5 --cpu=80%\n\n# Auto scale a deployment \"bar\", with the number of pods between 3 and 6, target average CPU of 500m and memory of 200Mi\noc autoscale deployment bar --min=3 --max=6 --cpu=500m --memory=200Mi\n\n# Auto scale a deployment \"bar\", with the number of pods between 2 and 8, target CPU utilization 60% and memory utilization 70%\noc autoscale deployment bar --min=3 --max=6 --cpu=60% --memory=70%",
+  "note": "官方说明：Autoscale a deployment config, deployment, replica set, stateful set, or replication controller"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc cancel-build：取消构建",
+  "code": "# Cancel the build with the given name\noc cancel-build ruby-build-2\n\n# Cancel the named build and print the build logs\noc cancel-build ruby-build-2 --dump-logs\n\n# Cancel the named build and create a new one with the same parameters\noc cancel-build ruby-build-2 --restart\n\n# Cancel multiple builds\noc cancel-build ruby-build-1 ruby-build-2 ruby-build-3\n\n# Cancel all builds created from the 'ruby-build' build config that are in the 'new' state\noc cancel-build bc/ruby-build --state=new",
+  "note": "官方说明：Cancel running, pending, or new builds"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc cluster-info：查看集群信息",
+  "code": "# Print the address of the control plane and cluster services\noc cluster-info",
+  "note": "官方说明：Display cluster information"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc cluster-info dump：导出集群调试信息",
+  "code": "# Dump current cluster state to stdout\noc cluster-info dump\n\n# Dump current cluster state to /path/to/cluster-state\noc cluster-info dump --output-directory=/path/to/cluster-state\n\n# Dump all namespaces to stdout\noc cluster-info dump --all-namespaces\n\n# Dump a set of namespaces to /path/to/cluster-state\noc cluster-info dump --namespaces default,kube-system --output-directory=/path/to/cluster-state",
+  "note": "官方说明：Dump relevant information for debugging and diagnosis"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc completion：生成命令行自动补全脚本",
+  "code": "# Installing bash completion on macOS using homebrew\n## If running Bash 3.2 included with macOS\nbrew install bash-completion\n## or, if running Bash 4.1+\nbrew install bash-completion@2\n## If oc is installed via homebrew, this should start working immediately\n## If you've installed via other means, you may need add the completion to your completion directory\noc completion bash > $(brew --prefix)/etc/bash_completion.d/oc\n\n\n# Installing bash completion on Linux\n## If bash-completion is not installed on Linux, install the 'bash-completion' package\n## via your distribution's package manager.\n## Load the oc completion code for bash into the current shell\nsource <(oc completion bash)\n## Write bash completion code to a file and source it from .bash_profile\noc completion bash > ~/.kube/completion.bash.inc\nprintf \"\n# oc shell completion\nsource '$HOME/.kube/completion.bash.inc'\n\" >> $HOME/.bash_profile\nsource $HOME/.bash_profile\n\n# Load the oc completion code for zsh[1] into the current shell\nsource <(oc completion zsh)\n# Set the oc completion code for zsh[1] to autoload on startup\noc completion zsh > \"${fpath[1]}/_oc\"\n\n\n# Load the oc completion code for fish[2] into the current shell\noc completion fish | source\n# To load completions for each session, execute once:\noc completion fish > ~/.config/fish/completions/oc.fish\n\n# Load the oc completion code for powershell into the current shell\noc completion powershell | Out-String | Invoke-Expression\n# Set oc completion code for powershell to run on startup\n## Save completion code to a script and execute in the profile\noc completion powershell > \"$HOME\\.kube\\completion.ps1\"\nAdd-Content $PROFILE \". '$HOME\\.kube\\completion.ps1'\"\n## Execute completion code in the profile\nAdd-Content $PROFILE \"if (Get-Command oc -ErrorAction SilentlyContinue) {\noc completion powershell | Out-String | Invoke-Expression\n}\"\n## Add completion code directly to the $PROFILE script\noc completion powershell >> $PROFILE",
+  "note": "官方说明：Output shell completion code for the specified shell (bash, zsh, fish, or powershell)"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config current-context：查看当前上下文",
+  "code": "# Display the current-context\noc config current-context",
+  "note": "官方说明：Display the current-context"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config delete-cluster：从 kubeconfig 删除集群",
+  "code": "# Delete the minikube cluster\noc config delete-cluster minikube",
+  "note": "官方说明：Delete the specified cluster from the kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config delete-context：从 kubeconfig 删除上下文",
+  "code": "# Delete the context for the minikube cluster\noc config delete-context minikube",
+  "note": "官方说明：Delete the specified context from the kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config delete-user：从 kubeconfig 删除用户",
+  "code": "# Delete the minikube user\noc config delete-user minikube",
+  "note": "官方说明：Delete the specified user from the kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config get-clusters：列出 kubeconfig 中的集群",
+  "code": "# List the clusters that oc knows about\noc config get-clusters",
+  "note": "官方说明：Display clusters defined in the kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config get-contexts：列出 kubeconfig 中的上下文",
+  "code": "# List all the contexts in your kubeconfig file\noc config get-contexts\n\n# Describe one context in your kubeconfig file\noc config get-contexts my-context",
+  "note": "官方说明：Describe one or many contexts"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config get-users：列出 kubeconfig 中的用户",
+  "code": "# List the users that oc knows about\noc config get-users",
+  "note": "官方说明：Display users defined in the kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config new-admin-kubeconfig：生成新的管理员 kubeconfig",
+  "code": "# Generate a new admin kubeconfig\noc config new-admin-kubeconfig",
+  "note": "官方说明：Generate, make the server trust, and display a new admin.kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config new-kubelet-bootstrap-kubeconfig：生成新的 kubelet 引导 kubeconfig",
+  "code": "# Generate a new kubelet bootstrap kubeconfig\noc config new-kubelet-bootstrap-kubeconfig",
+  "note": "官方说明：Generate, make the server trust, and display a new kubelet /etc/kubernetes/kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config refresh-ca-bundle：从 API 服务器刷新 CA 证书包",
+  "code": "# Refresh the CA bundle for the current context's cluster\noc config refresh-ca-bundle\n\n# Refresh the CA bundle for the cluster named e2e in your kubeconfig\noc config refresh-ca-bundle e2e\n\n# Print the CA bundle from the current OpenShift cluster's API server\noc config refresh-ca-bundle --dry-run",
+  "note": "官方说明：Update the OpenShift CA bundle by contacting the API server"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config rename-context：重命名上下文",
+  "code": "# Rename the context 'old-name' to 'new-name' in your kubeconfig file\noc config rename-context old-name new-name",
+  "note": "官方说明：Rename a context from the kubeconfig file"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config set：设置 kubeconfig 中的某个值",
+  "code": "# Set the server field on the my-cluster cluster to https://1.2.3.4\noc config set clusters.my-cluster.server https://1.2.3.4\n\n# Set the certificate-authority-data field on the my-cluster cluster\noc config set clusters.my-cluster.certificate-authority-data $(echo \"cert_data_here\" | base64 -i -)\n\n# Set the cluster field in the my-context context to my-cluster\noc config set contexts.my-context.cluster my-cluster\n\n# Set the client-key-data field in the cluster-admin user using --set-raw-bytes option\noc config set users.cluster-admin.client-key-data cert_data_here --set-raw-bytes=true",
+  "note": "官方说明：Set an individual value in a kubeconfig file"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config set-cluster：设置 kubeconfig 中的集群",
+  "code": "# Set only the server field on the e2e cluster entry without touching other values\noc config set-cluster e2e --server=https://1.2.3.4\n\n# Embed certificate authority data for the e2e cluster entry\noc config set-cluster e2e --embed-certs --certificate-authority=~/.kube/e2e/kubernetes.ca.crt\n\n# Disable cert checking for the e2e cluster entry\noc config set-cluster e2e --insecure-skip-tls-verify=true\n\n# Set the custom TLS server name to use for validation for the e2e cluster entry\noc config set-cluster e2e --tls-server-name=my-cluster-name\n\n# Set the proxy URL for the e2e cluster entry\noc config set-cluster e2e --proxy-url=https://1.2.3.4",
+  "note": "官方说明：Set a cluster entry in kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config set-context：设置 kubeconfig 中的上下文",
+  "code": "# Set the user field on the gce context entry without touching other values\noc config set-context gce --user=cluster-admin",
+  "note": "官方说明：Set a context entry in kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config set-credentials：设置 kubeconfig 中的用户凭据",
+  "code": "# Set only the \"client-key\" field on the \"cluster-admin\"\n# entry, without touching other values\noc config set-credentials cluster-admin --client-key=~/.kube/admin.key\n\n# Set basic auth for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --username=admin --password=uXFGweU9l35qcif\n\n# Embed client certificate data in the \"cluster-admin\" entry\noc config set-credentials cluster-admin --client-certificate=~/.kube/admin.crt --embed-certs=true\n\n# Enable the Google Compute Platform auth provider for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --auth-provider=gcp\n\n# Enable the OpenID Connect auth provider for the \"cluster-admin\" entry with additional arguments\noc config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-id=foo --auth-provider-arg=client-secret=bar\n\n# Remove the \"client-secret\" config value for the OpenID Connect auth provider for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --auth-provider=oidc --auth-provider-arg=client-secret-\n\n# Enable new exec auth plugin for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --exec-command=/path/to/the/executable --exec-api-version=client.authentication.k8s.io/v1beta1\n\n# Enable new exec auth plugin for the \"cluster-admin\" entry with interactive mode\noc config set-credentials cluster-admin --exec-command=/path/to/the/executable --exec-api-version=client.authentication.k8s.io/v1beta1 --exec-interactive-mode=Never\n\n# Define new exec auth plugin arguments for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --exec-arg=arg1 --exec-arg=arg2\n\n# Create or update exec auth plugin environment variables for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --exec-env=key1=val1 --exec-env=key2=val2\n\n# Remove exec auth plugin environment variables for the \"cluster-admin\" entry\noc config set-credentials cluster-admin --exec-env=var-to-remove-",
+  "note": "官方说明：Set a user entry in kubeconfig"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config unset：取消 kubeconfig 中的某个值",
+  "code": "# Unset the current-context\noc config unset current-context\n\n# Unset namespace in foo context\noc config unset contexts.foo.namespace",
+  "note": "官方说明：Unset an individual value in a kubeconfig file"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config use-context：切换当前上下文",
+  "code": "# Use the context for the minikube cluster\noc config use-context minikube",
+  "note": "官方说明：Set the current-context in a kubeconfig file"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc config view：查看 kubeconfig 配置",
+  "code": "# Show merged kubeconfig settings\noc config view\n\n# Show merged kubeconfig settings, raw certificate data, and exposed secrets\noc config view --raw\n\n# Get the password for the e2e user\noc config view -o jsonpath='{.users[?(@.name == \"e2e\")].user.password}'",
+  "note": "官方说明：Display merged kubeconfig settings or a specified kubeconfig file"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc cp：在容器和本地之间复制文件",
+  "code": "# !!!Important Note!!!\n# Requires that the 'tar' binary is present in your container\n# image.  If 'tar' is not present, 'oc cp' will fail.\n#\n# For advanced use cases, such as symlinks, wildcard expansion or\n# file mode preservation, consider using 'oc exec'.\n\n# Copy /tmp/foo local file to /tmp/bar in a remote pod in namespace <some-namespace>\ntar cf - /tmp/foo | oc exec -i -n <some-namespace> <some-pod> -- tar xf - -C /tmp/bar\n\n# Copy /tmp/foo from a remote pod to /tmp/bar locally\noc exec -n <some-namespace> <some-pod> -- tar cf - /tmp/foo | tar xf - -C /tmp/bar\n\n# Copy /tmp/foo_dir local directory to /tmp/bar_dir in a remote pod in the default namespace\noc cp /tmp/foo_dir <some-pod>:/tmp/bar_dir\n\n# Copy /tmp/foo local file to /tmp/bar in a remote pod in a specific container\noc cp /tmp/foo <some-pod>:/tmp/bar -c <specific-container>\n\n# Copy /tmp/foo local file to /tmp/bar in a remote pod in namespace <some-namespace>\noc cp /tmp/foo <some-namespace>/<some-pod>:/tmp/bar\n\n# Copy /tmp/foo from a remote pod to /tmp/bar locally\noc cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar",
+  "note": "官方说明：Copy files and directories to and from containers"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create：按文件创建资源",
+  "code": "# Create a pod using the data in pod.json\noc create -f ./pod.json\n\n# Create a pod based on the JSON passed into stdin\ncat pod.json | oc create -f -\n\n# Edit the data in registry.yaml in JSON then create the resource using the edited data\noc create -f registry.yaml --edit -o json",
+  "note": "官方说明：Create a resource from a file or from stdin"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create build：创建构建",
+  "code": "# Create a new build\noc create build myapp",
+  "note": "官方说明：Create a new build"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create clusterresourcequota：创建跨项目的集群资源配额",
+  "code": "# Create a cluster resource quota limited to 10 pods\noc create clusterresourcequota limit-bob --project-annotation-selector=openshift.io/requester=user-bob --hard=pods=10",
+  "note": "官方说明：Create a cluster resource quota"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create clusterrole：创建集群角色",
+  "code": "# Create a cluster role named \"pod-reader\" that allows user to perform \"get\", \"watch\" and \"list\" on pods\noc create clusterrole pod-reader --verb=get,list,watch --resource=pods\n\n# Create a cluster role named \"pod-reader\" with ResourceName specified\noc create clusterrole pod-reader --verb=get --resource=pods --resource-name=readablepod --resource-name=anotherpod\n\n# Create a cluster role named \"foo\" with API Group specified\noc create clusterrole foo --verb=get,list,watch --resource=rs.apps\n\n# Create a cluster role named \"foo\" with SubResource specified\noc create clusterrole foo --verb=get,list,watch --resource=pods,pods/status\n\n# Create a cluster role name \"foo\" with NonResourceURL specified\noc create clusterrole \"foo\" --verb=get --non-resource-url=/logs/*\n\n# Create a cluster role name \"monitoring\" with AggregationRule specified\noc create clusterrole monitoring --aggregation-rule=\"rbac.example.com/aggregate-to-monitoring=true\"",
+  "note": "官方说明：Create a cluster role"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create clusterrolebinding：创建集群角色绑定",
+  "code": "# Create a cluster role binding for user1, user2, and group1 using the cluster-admin cluster role\noc create clusterrolebinding cluster-admin --clusterrole=cluster-admin --user=user1 --user=user2 --group=group1",
+  "note": "官方说明：Create a cluster role binding for a particular cluster role"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create configmap：创建 ConfigMap",
+  "code": "# Create a new config map named my-config based on folder bar\noc create configmap my-config --from-file=path/to/bar\n\n# Create a new config map named my-config with specified keys instead of file basenames on disk\noc create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt\n\n# Create a new config map named my-config with key1=config1 and key2=config2\noc create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2\n\n# Create a new config map named my-config from the key=value pairs in the file\noc create configmap my-config --from-file=path/to/bar\n\n# Create a new config map named my-config from an env file\noc create configmap my-config --from-env-file=path/to/foo.env --from-env-file=path/to/bar.env",
+  "note": "官方说明：Create a config map from a local file, directory or literal value"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create cronjob：创建 CronJob",
+  "code": "# Create a cron job\noc create cronjob my-job --image=busybox --schedule=\"*/1 * * * *\"\n\n# Create a cron job with a command\noc create cronjob my-job --image=busybox --schedule=\"*/1 * * * *\" -- date",
+  "note": "官方说明：Create a cron job with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create deployment：创建 Deployment",
+  "code": "# Create a deployment named my-dep that runs the busybox image\noc create deployment my-dep --image=busybox\n\n# Create a deployment with a command\noc create deployment my-dep --image=busybox -- date\n\n# Create a deployment named my-dep that runs the nginx image with 3 replicas\noc create deployment my-dep --image=nginx --replicas=3\n\n# Create a deployment named my-dep that runs the busybox image and expose port 5701\noc create deployment my-dep --image=busybox --port=5701\n\n# Create a deployment named my-dep that runs multiple containers\noc create deployment my-dep --image=busybox:latest --image=ubuntu:latest --image=nginx",
+  "note": "官方说明：Create a deployment with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create deploymentconfig：创建 DeploymentConfig（已弃用）",
+  "code": "# Create an nginx deployment config named my-nginx\noc create deploymentconfig my-nginx --image=nginx",
+  "note": "官方说明：Create a deployment config with default options that uses a given image"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create identity：手动创建身份",
+  "code": "# Create an identity with identity provider \"acme_ldap\" and the identity provider username \"adamjones\"\noc create identity acme_ldap:adamjones",
+  "note": "官方说明：Manually create an identity (only needed if automatic creation is disabled)"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create imagestream：创建空的 ImageStream",
+  "code": "# Create a new image stream\noc create imagestream mysql",
+  "note": "官方说明：Create a new empty image stream"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create imagestreamtag：创建 ImageStream 标签",
+  "code": "# Create a new image stream tag based on an image in a remote registry\noc create imagestreamtag mysql:latest --from-image=myregistry.local/mysql/mysql:5.0",
+  "note": "官方说明：Create a new image stream tag"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create ingress：创建 Ingress",
+  "code": "# Create a single ingress called 'simple' that directs requests to foo.com/bar to svc\n# svc1:8080 with a TLS secret \"my-cert\"\noc create ingress simple --rule=\"foo.com/bar=svc1:8080,tls=my-cert\"\n\n# Create a catch all ingress of \"/path\" pointing to service svc:port and Ingress Class as \"otheringress\"\noc create ingress catch-all --class=otheringress --rule=\"/path=svc:port\"\n\n# Create an ingress with two annotations: ingress.annotation1 and ingress.annotations2\noc create ingress annotated --class=default --rule=\"foo.com/bar=svc:port\" \\\n--annotation ingress.annotation1=foo \\\n--annotation ingress.annotation2=bla\n\n# Create an ingress with the same host and multiple paths\noc create ingress multipath --class=default \\\n--rule=\"foo.com/=svc:port\" \\\n--rule=\"foo.com/admin/=svcadmin:portadmin\"\n\n# Create an ingress with multiple hosts and the pathType as Prefix\noc create ingress ingress1 --class=default \\\n--rule=\"foo.com/path*=svc:8080\" \\\n--rule=\"bar.com/admin*=svc2:http\"\n\n# Create an ingress with TLS enabled using the default ingress certificate and different path types\noc create ingress ingtls --class=default \\\n--rule=\"foo.com/=svc:https,tls\" \\\n--rule=\"foo.com/path/subpath*=othersvc:8080\"\n\n# Create an ingress with TLS enabled using a specific secret and pathType as Prefix\noc create ingress ingsecret --class=default \\\n--rule=\"foo.com/*=svc:8080,tls=secret1\"\n\n# Create an ingress with a default backend\noc create ingress ingdefault --class=default \\\n--default-backend=defaultsvc:http \\\n--rule=\"foo.com/*=svc:8080,tls=secret1\"",
+  "note": "官方说明：Create an ingress with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create job：创建 Job",
+  "code": "# Create a job\noc create job my-job --image=busybox\n\n# Create a job with a command\noc create job my-job --image=busybox -- date\n\n# Create a job from a cron job named \"a-cronjob\"\noc create job test-job --from=cronjob/a-cronjob",
+  "note": "官方说明：Create a job with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create namespace：创建命名空间",
+  "code": "# Create a new namespace named my-namespace\noc create namespace my-namespace",
+  "note": "官方说明：Create a namespace with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create poddisruptionbudget：创建 PodDisruptionBudget",
+  "code": "# Create a pod disruption budget named my-pdb that will select all pods with the app=rails label\n# and require at least one of them being available at any point in time\noc create poddisruptionbudget my-pdb --selector=app=rails --min-available=1\n\n# Create a pod disruption budget named my-pdb that will select all pods with the app=nginx label\n# and require at least half of the pods selected to be available at any point in time\noc create pdb my-pdb --selector=app=nginx --min-available=50%",
+  "note": "官方说明：Create a pod disruption budget with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create priorityclass：创建优先级类",
+  "code": "# Create a priority class named high-priority\noc create priorityclass high-priority --value=1000 --description=\"high priority\"\n\n# Create a priority class named default-priority that is considered as the global default priority\noc create priorityclass default-priority --value=1000 --global-default=true --description=\"default priority\"\n\n# Create a priority class named high-priority that cannot preempt pods with lower priority\noc create priorityclass high-priority --value=1000 --description=\"high priority\" --preemption-policy=\"Never\"",
+  "note": "官方说明：Create a priority class with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create quota：创建资源配额",
+  "code": "# Create a new resource quota named my-quota\noc create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10\n\n# Create a new resource quota named best-effort\noc create quota best-effort --hard=pods=100 --scopes=BestEffort",
+  "note": "官方说明：Create a quota with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create role：创建角色",
+  "code": "# Create a role named \"pod-reader\" that allows user to perform \"get\", \"watch\" and \"list\" on pods\noc create role pod-reader --verb=get --verb=list --verb=watch --resource=pods\n\n# Create a role named \"pod-reader\" with ResourceName specified\noc create role pod-reader --verb=get --resource=pods --resource-name=readablepod --resource-name=anotherpod\n\n# Create a role named \"foo\" with API Group specified\noc create role foo --verb=get,list,watch --resource=rs.apps\n\n# Create a role named \"foo\" with SubResource specified\noc create role foo --verb=get,list,watch --resource=pods,pods/status",
+  "note": "官方说明：Create a role with single rule"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create rolebinding：创建角色绑定",
+  "code": "# Create a role binding for user1, user2, and group1 using the admin cluster role\noc create rolebinding admin --clusterrole=admin --user=user1 --user=user2 --group=group1\n\n# Create a role binding for service account monitoring:sa-dev using the admin role\noc create rolebinding admin-binding --role=admin --serviceaccount=monitoring:sa-dev",
+  "note": "官方说明：Create a role binding for a particular role or cluster role"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create route edge：创建 edge 终止的 HTTPS Route",
+  "code": "# Create an edge route named \"my-route\" that exposes the frontend service\noc create route edge my-route --service=frontend\n\n# Create an edge route that exposes the frontend service and specify a path\n# If the route name is omitted, the service name will be used\noc create route edge --service=frontend --path /assets",
+  "note": "官方说明：Create a route that uses edge TLS termination"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create route passthrough：创建 passthrough 透传的 Route",
+  "code": "# Create a passthrough route named \"my-route\" that exposes the frontend service\noc create route passthrough my-route --service=frontend\n\n# Create a passthrough route that exposes the frontend service and specify\n# a host name. If the route name is omitted, the service name will be used\noc create route passthrough --service=frontend --hostname=www.example.com",
+  "note": "官方说明：Create a route that uses passthrough TLS termination"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create route reencrypt：创建 reencrypt 重加密的 Route",
+  "code": "# Create a route named \"my-route\" that exposes the frontend service\noc create route reencrypt my-route --service=frontend --dest-ca-cert cert.cert\n\n# Create a reencrypt route that exposes the frontend service, letting the\n# route name default to the service name and the destination CA certificate\n# default to the service CA\noc create route reencrypt --service=frontend",
+  "note": "官方说明：Create a route that uses reencrypt TLS termination"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create secret docker-registry：创建镜像仓库认证 Secret",
+  "code": "# If you do not already have a .dockercfg file, create a dockercfg secret directly\noc create secret docker-registry my-secret --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL\n\n# Create a new secret named my-secret from ~/.docker/config.json\noc create secret docker-registry my-secret --from-file=path/to/.docker/config.json",
+  "note": "官方说明：Create a secret for use with a Docker registry"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create secret generic：创建通用 Secret",
+  "code": "# Create a new secret named my-secret with keys for each file in folder bar\noc create secret generic my-secret --from-file=path/to/bar\n\n# Create a new secret named my-secret with specified keys instead of names on disk\noc create secret generic my-secret --from-file=ssh-privatekey=path/to/id_rsa --from-file=ssh-publickey=path/to/id_rsa.pub\n\n# Create a new secret named my-secret with key1=supersecret and key2=topsecret\noc create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret\n\n# Create a new secret named my-secret using a combination of a file and a literal\noc create secret generic my-secret --from-file=ssh-privatekey=path/to/id_rsa --from-literal=passphrase=topsecret\n\n# Create a new secret named my-secret from env files\noc create secret generic my-secret --from-env-file=path/to/foo.env --from-env-file=path/to/bar.env",
+  "note": "官方说明：Create a secret from a local file, directory, or literal value"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create secret tls：创建 TLS 证书 Secret",
+  "code": "# Create a new TLS secret named tls-secret with the given key pair\noc create secret tls tls-secret --cert=path/to/tls.crt --key=path/to/tls.key",
+  "note": "官方说明：Create a TLS secret"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create service clusterip：创建 ClusterIP 服务",
+  "code": "# Create a new ClusterIP service named my-cs\noc create service clusterip my-cs --tcp=5678:8080\n\n# Create a new ClusterIP service named my-cs (in headless mode)\noc create service clusterip my-cs --clusterip=\"None\"",
+  "note": "官方说明：Create a ClusterIP service"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create service externalname：创建 ExternalName 服务",
+  "code": "# Create a new ExternalName service named my-ns\noc create service externalname my-ns --external-name bar.com",
+  "note": "官方说明：Create an ExternalName service"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create service loadbalancer：创建 LoadBalancer 服务",
+  "code": "# Create a new LoadBalancer service named my-lbs\noc create service loadbalancer my-lbs --tcp=5678:8080",
+  "note": "官方说明：Create a LoadBalancer service"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create service nodeport：创建 NodePort 服务",
+  "code": "# Create a new NodePort service named my-ns\noc create service nodeport my-ns --tcp=5678:8080",
+  "note": "官方说明：Create a NodePort service"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create serviceaccount：创建 ServiceAccount",
+  "code": "# Create a new service account named my-service-account\noc create serviceaccount my-service-account",
+  "note": "官方说明：Create a service account with the specified name"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create token：为 ServiceAccount 申请 Token",
+  "code": "# Request a token to authenticate to the kube-apiserver as the service account \"myapp\" in the current namespace\noc create token myapp\n\n# Request a token for a service account in a custom namespace\noc create token myapp --namespace myns\n\n# Request a token with a custom expiration\noc create token myapp --duration 10m\n\n# Request a token with a custom audience\noc create token myapp --audience https://example.com\n\n# Request a token bound to an instance of a Secret object\noc create token myapp --bound-object-kind Secret --bound-object-name mysecret\n\n# Request a token bound to an instance of a Secret object with a specific UID\noc create token myapp --bound-object-kind Secret --bound-object-name mysecret --bound-object-uid 0d4691ed-659b-4935-a832-355f77ee47cc",
+  "note": "官方说明：Request a service account token"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create user：手动创建用户",
+  "code": "# Create a user with the username \"ajones\" and the display name \"Adam Jones\"\noc create user ajones --full-name=\"Adam Jones\"",
+  "note": "官方说明：Manually create a user (only needed if automatic creation is disabled)"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc create useridentitymapping：手动关联身份与用户",
+  "code": "# Map the identity \"acme_ldap:adamjones\" to the user \"ajones\"\noc create useridentitymapping acme_ldap:adamjones ajones",
+  "note": "官方说明：Manually map an identity to a user"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc debug：启动调试 Pod（也可调试节点）",
+  "code": "# Start a shell session into a pod using the OpenShift tools image\noc debug\n\n# Debug a currently running deployment by creating a new pod\noc debug deploy/test\n\n# Debug a node as an administrator\noc debug node/master-1\n\n# Debug a Windows node\n# Note: the chosen image must match the Windows Server version (2019, 2022) of the node\noc debug node/win-worker-1 --image=mcr.microsoft.com/powershell:lts-nanoserver-ltsc2022\n\n# Launch a shell in a pod using the provided image stream tag\noc debug istag/mysql:latest -n openshift\n\n# Test running a job as a non-root user\noc debug job/test --as-user=1000000\n\n# Debug a specific failing container by running the env command in the 'second' container\noc debug daemonset/test -c second -- /bin/env\n\n# See the pod that would be created to debug\noc debug mypod-9xbc -o yaml\n\n# Debug a resource but launch the debug pod in another namespace\n# Note: Not all resources can be debugged using --to-namespace without modification. For example,\n# volumes and service accounts are namespace-dependent. Add '-o yaml' to output the debug pod definition\n# to disk.  If necessary, edit the definition then run 'oc debug -f -' or run without --to-namespace\noc debug mypod-9xbc --to-namespace testns",
+  "note": "官方说明：Launch a new instance of a pod for debugging"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc delete：删除资源",
+  "code": "# Delete a pod using the type and name specified in pod.json\noc delete -f ./pod.json\n\n# Delete resources from a directory containing kustomization.yaml - e.g. dir/kustomization.yaml\noc delete -k dir\n\n# Delete resources from all files that end with '.json'\noc delete -f '*.json'\n\n# Delete a pod based on the type and name in the JSON passed into stdin\ncat pod.json | oc delete -f -\n\n# Delete pods and services with same names \"baz\" and \"foo\"\noc delete pod,service baz foo\n\n# Delete pods and services with label name=myLabel\noc delete pods,services -l name=myLabel\n\n# Delete a pod with minimal delay\noc delete pod foo --now\n\n# Force delete a pod on a dead node\noc delete pod foo --force\n\n# Delete all pods\noc delete pods --all\n\n# Delete all pods only if the user confirms the deletion\noc delete pods --all --interactive",
+  "note": "官方说明：Delete resources by file names, stdin, resources and names, or by resources and label selector"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc describe：查看资源详情",
+  "code": "# Describe a node\noc describe nodes kubernetes-node-emt8.c.myproject.internal\n\n# Describe a pod\noc describe pods/nginx\n\n# Describe a pod identified by type and name in \"pod.json\"\noc describe -f pod.json\n\n# Describe all pods\noc describe pods\n\n# Describe pods by label name=myLabel\noc describe pods -l name=myLabel\n\n# Describe all pods managed by the 'frontend' replication controller\n# (rc-created pods get the name of the rc as a prefix in the pod name)\noc describe pods frontend",
+  "note": "官方说明：Show details of a specific resource or group of resources"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc diff：比较线上资源与将要应用的配置",
+  "code": "# Diff resources included in pod.json\noc diff -f pod.json\n\n# Diff file read from stdin\ncat service.yaml | oc diff -f -",
+  "note": "官方说明：Diff the live version against a would-be applied version"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc edit：在线编辑资源",
+  "code": "# Edit the service named 'registry'\noc edit svc/registry\n\n# Use an alternative editor\nKUBE_EDITOR=\"nano\" oc edit svc/registry\n\n# Edit the job 'myjob' in JSON using the v1 API format\noc edit job.v1.batch/myjob -o json\n\n# Edit the deployment 'mydeployment' in YAML and save the modified config in its annotation\noc edit deployment/mydeployment -o yaml --save-config\n\n# Edit the 'status' subresource for the 'mydeployment' deployment\noc edit deployment mydeployment --subresource='status'",
+  "note": "官方说明：Edit a resource on the server"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc events：查看事件",
+  "code": "# List recent events in the default namespace\noc events\n\n# List recent events in all namespaces\noc events --all-namespaces\n\n# List recent events for the specified pod, then wait for more events and list them as they arrive\noc events --for pod/web-pod-13je7 --watch\n\n# List recent events in YAML format\noc events -oyaml\n\n# List recent only events of type 'Warning' or 'Normal'\noc events --types=Warning,Normal",
+  "note": "官方说明：List events"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc exec：在容器中执行命令",
+  "code": "# Get output from running the 'date' command from pod mypod, using the first container by default\noc exec mypod -- date\n\n# Get output from running the 'date' command in ruby-container from pod mypod\noc exec mypod -c ruby-container -- date\n\n# Switch to raw terminal mode; sends stdin to 'bash' in ruby-container from pod mypod\n# and sends stdout/stderr from 'bash' back to the client\noc exec mypod -c ruby-container -i -t -- bash -il\n\n# List contents of /usr from the first container of pod mypod and sort by modification time\n# If the command you want to execute in the pod has any flags in common (e.g. -i),\n# you must use two dashes (--) to separate your command's flags/arguments\n# Also note, do not surround your command and its flags/arguments with quotes\n# unless that is how you would execute it normally (i.e., do ls -t /usr, not \"ls -t /usr\")\noc exec mypod -i -t -- ls -t /usr\n\n# Get output from running 'date' command from the first pod of the deployment mydeployment, using the first container by default\noc exec deploy/mydeployment -- date\n\n# Get output from running 'date' command from the first pod of the service myservice, using the first container by default\noc exec svc/myservice -- date",
+  "note": "官方说明：Execute a command in a container"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc explain：查看资源字段说明",
+  "code": "# Get the documentation of the resource and its fields\noc explain pods\n\n# Get all the fields in the resource\noc explain pods --recursive\n\n# Get the explanation for deployment in supported api versions\noc explain deployments --api-version=apps/v1\n\n# Get the documentation of a specific field of a resource\noc explain pods.spec.containers\n\n# Get the documentation of resources in different format\noc explain deployment --output=plaintext-openapiv2",
+  "note": "官方说明：Get documentation for a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc expose：把应用暴露为 Service 或 Route",
+  "code": "# Create a route based on service nginx. The new route will reuse nginx's labels\noc expose service nginx\n\n# Create a route and specify your own label and route name\noc expose service nginx -l name=myroute --name=fromdowntown\n\n# Create a route and specify a host name\noc expose service nginx --hostname=www.example.com\n\n# Create a route with a wildcard\noc expose service nginx --hostname=x.example.com --wildcard-policy=Subdomain\n# This would be equivalent to *.example.com. NOTE: only hosts are matched by the wildcard; subdomains would not be included\n\n# Expose a deployment configuration as a service and use the specified port\noc expose dc ruby-hello-world --port=8080\n\n# Expose a service as a route in the specified path\noc expose service nginx --path=/nginx",
+  "note": "官方说明：Expose a replicated application as a service or route"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc extract：把 Secret / ConfigMap 导出到磁盘",
+  "code": "# Extract the secret \"test\" to the current directory\noc extract secret/test\n\n# Extract the config map \"nginx\" to the /tmp directory\noc extract configmap/nginx --to=/tmp\n\n# Extract the config map \"nginx\" to STDOUT\noc extract configmap/nginx --to=-\n\n# Extract only the key \"nginx.conf\" from config map \"nginx\" to the /tmp directory\noc extract configmap/nginx --to=/tmp --keys=nginx.conf",
+  "note": "官方说明：Extract secrets or config maps to disk"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc get：查看资源",
+  "code": "# List all pods in ps output format\noc get pods\n\n# List all pods in ps output format with more information (such as node name)\noc get pods -o wide\n\n# List a single replication controller with specified NAME in ps output format\noc get replicationcontroller web\n\n# List deployments in JSON output format, in the \"v1\" version of the \"apps\" API group\noc get deployments.v1.apps -o json\n\n# List a single pod in JSON output format\noc get -o json pod web-pod-13je7\n\n# List a pod identified by type and name specified in \"pod.yaml\" in JSON output format\noc get -f pod.yaml -o json\n\n# List resources from a directory with kustomization.yaml - e.g. dir/kustomization.yaml\noc get -k dir/\n\n# Return only the phase value of the specified pod\noc get -o template pod/web-pod-13je7 --template={{.status.phase}}\n\n# List resource information in custom columns\noc get pod test-pod -o custom-columns=CONTAINER:.spec.containers[0].name,IMAGE:.spec.containers[0].image\n\n# List all replication controllers and services together in ps output format\noc get rc,services\n\n# List one or more resources by their type and names\noc get rc/web service/frontend pods/web-pod-13je7\n\n# List the 'status' subresource for a single pod\noc get pod web-pod-13je7 --subresource status\n\n# List all deployments in namespace 'backend'\noc get deployments.apps --namespace backend\n\n# List all pods existing in all namespaces\noc get pods --all-namespaces",
+  "note": "官方说明：Display one or many resources"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc get-token：从外部 OIDC 获取 Token（实验性）",
+  "code": "# Starts an auth code flow to the issuer URL with the client ID and the given extra scopes\noc get-token --client-id=client-id --issuer-url=test.issuer.url --extra-scopes=email,profile\n\n# Starts an auth code flow to the issuer URL with a different callback address\noc get-token --client-id=client-id --issuer-url=test.issuer.url --callback-address=127.0.0.1:8343",
+  "note": "官方说明：Experimental: Get token from external OIDC issuer as credentials exec plugin"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc idle：闲置（缩容到 0）可伸缩资源",
+  "code": "# Idle the scalable controllers associated with the services listed in to-idle.txt\n$ oc idle --resource-names-file to-idle.txt",
+  "note": "官方说明：Idle scalable resources"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc image append：给镜像追加层并推送",
+  "code": "# Remove the entrypoint on the mysql:latest image\noc image append --from mysql:latest --to myregistry.com/myimage:latest --image '{\"Entrypoint\":null}'\n\n# Add a new layer to the image\noc image append --from mysql:latest --to myregistry.com/myimage:latest layer.tar.gz\n\n# Add a new layer to the image and store the result on disk\n# This results in $(pwd)/v2/mysql/blobs,manifests\noc image append --from mysql:latest --to file://mysql:local layer.tar.gz\n\n# Add a new layer to the image and store the result on disk in a designated directory\n# This will result in $(pwd)/mysql-local/v2/mysql/blobs,manifests\noc image append --from mysql:latest --to file://mysql:local --dir mysql-local layer.tar.gz\n\n# Add a new layer to an image that is stored on disk (~/mysql-local/v2/image exists)\noc image append --from-dir ~/mysql-local --to myregistry.com/myimage:latest layer.tar.gz\n\n# Add a new layer to an image that was mirrored to the current directory on disk ($(pwd)/v2/image exists)\noc image append --from-dir v2 --to myregistry.com/myimage:latest layer.tar.gz\n\n# Add a new layer to a multi-architecture image for an os/arch that is different from the system's os/arch\n# Note: The first image in the manifest list that matches the filter will be returned when --keep-manifest-list is not specified\noc image append --from docker.io/library/busybox:latest --filter-by-os=linux/s390x --to myregistry.com/myimage:latest layer.tar.gz\n\n# Add a new layer to a multi-architecture image for all the os/arch manifests when keep-manifest-list is specified\noc image append --from docker.io/library/busybox:latest --keep-manifest-list --to myregistry.com/myimage:latest layer.tar.gz\n\n# Add a new layer to a multi-architecture image for all the os/arch manifests that is specified by the filter, while preserving the manifestlist\noc image append --from docker.io/library/busybox:latest --filter-by-os=linux/s390x --keep-manifest-list --to myregistry.com/myimage:latest layer.tar.gz",
+  "note": "官方说明：Add layers to images and push them to a registry"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc image extract：从镜像中提取文件",
+  "code": "# Extract the busybox image into the current directory\noc image extract docker.io/library/busybox:latest\n\n# Extract the busybox image into a designated directory (must exist)\noc image extract docker.io/library/busybox:latest --path /:/tmp/busybox\n\n# Extract the busybox image into the current directory for linux/s390x platform\n# Note: Wildcard filter is not supported with extract; pass a single os/arch to extract\noc image extract docker.io/library/busybox:latest --filter-by-os=linux/s390x\n\n# Extract a single file from the image into the current directory\noc image extract docker.io/library/centos:7 --path /bin/bash:.\n\n# Extract all .repo files from the image's /etc/yum.repos.d/ folder into the current directory\noc image extract docker.io/library/centos:7 --path /etc/yum.repos.d/*.repo:.\n\n# Extract all .repo files from the image's /etc/yum.repos.d/ folder into a designated directory (must exist)\n# This results in /tmp/yum.repos.d/*.repo on local system\noc image extract docker.io/library/centos:7 --path /etc/yum.repos.d/*.repo:/tmp/yum.repos.d\n\n# Extract an image stored on disk into the current directory ($(pwd)/v2/busybox/blobs,manifests exists)\n# --confirm is required because the current directory is not empty\noc image extract file://busybox:local --confirm\n\n# Extract an image stored on disk in a directory other than $(pwd)/v2 into the current directory\n# --confirm is required because the current directory is not empty ($(pwd)/busybox-mirror-dir/v2/busybox exists)\noc image extract file://busybox:local --dir busybox-mirror-dir --confirm\n\n# Extract an image stored on disk in a directory other than $(pwd)/v2 into a designated directory (must exist)\noc image extract file://busybox:local --dir busybox-mirror-dir --path /:/tmp/busybox\n\n# Extract the last layer in the image\noc image extract docker.io/library/centos:7[-1]\n\n# Extract the first three layers of the image\noc image extract docker.io/library/centos:7[:3]\n\n# Extract the last three layers of the image\noc image extract docker.io/library/centos:7[-3:]",
+  "note": "官方说明：Copy files from an image to the file system"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc image info：查看镜像信息",
+  "code": "# Show information about an image\noc image info quay.io/openshift/cli:latest\n\n# Show information about images matching a wildcard\noc image info quay.io/openshift/cli:4.*\n\n# Show information about a file mirrored to disk under DIR\noc image info --dir=DIR file://library/busybox:latest\n\n# Select which image from a multi-OS image to show\noc image info library/busybox:latest --filter-by-os=linux/arm64",
+  "note": "官方说明：Display information about an image"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc image mirror：在仓库之间复制镜像",
+  "code": "# Copy image to another tag\noc image mirror myregistry.com/myimage:latest myregistry.com/myimage:stable\n\n# Copy image to another registry\noc image mirror myregistry.com/myimage:latest docker.io/myrepository/myimage:stable\n\n# Copy all tags starting with mysql to the destination repository\noc image mirror myregistry.com/myimage:mysql* docker.io/myrepository/myimage\n\n# Copy image to disk, creating a directory structure that can be served as a registry\noc image mirror myregistry.com/myimage:latest file://myrepository/myimage:latest\n\n# Copy image to S3 (pull from <bucket>.s3.amazonaws.com/image:latest)\noc image mirror myregistry.com/myimage:latest s3://s3.amazonaws.com/<region>/<bucket>/image:latest\n\n# Copy image to S3 without setting a tag (pull via @<digest>)\noc image mirror myregistry.com/myimage:latest s3://s3.amazonaws.com/<region>/<bucket>/image\n\n# Copy image to multiple locations\noc image mirror myregistry.com/myimage:latest docker.io/myrepository/myimage:stable \\\ndocker.io/myrepository/myimage:dev\n\n# Copy multiple images\noc image mirror myregistry.com/myimage:latest=myregistry.com/other:test \\\nmyregistry.com/myimage:new=myregistry.com/other:target\n\n# Copy manifest list of a multi-architecture image, even if only a single image is found\noc image mirror myregistry.com/myimage:latest=myregistry.com/other:test \\\n--keep-manifest-list=true\n\n# Copy specific os/arch manifest of a multi-architecture image\n# Run 'oc image info myregistry.com/myimage:latest' to see available os/arch for multi-arch images\n# Note that with multi-arch images, this results in a new manifest list digest that includes only the filtered manifests\noc image mirror myregistry.com/myimage:latest=myregistry.com/other:test \\\n--filter-by-os=os/arch\n\n# Copy all os/arch manifests of a multi-architecture image\n# Run 'oc image info myregistry.com/myimage:latest' to see list of os/arch manifests that will be mirrored\noc image mirror myregistry.com/myimage:latest=myregistry.com/other:test \\\n--keep-manifest-list=true\n\n# Note the above command is equivalent to\noc image mirror myregistry.com/myimage:latest=myregistry.com/other:test \\\n--filter-by-os=.*\n\n# Copy specific os/arch manifest of a multi-architecture image\n# Run 'oc image info myregistry.com/myimage:latest' to see available os/arch for multi-arch images\n# Note that the target registry may reject a manifest list if the platform specific images do not all exist\n# You must use a registry with sparse registry support enabled\noc image mirror myregistry.com/myimage:latest=myregistry.com/other:test \\\n--filter-by-os=linux/386 \\\n--keep-manifest-list=true",
+  "note": "官方说明：Mirror images from one repository to another"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc import-image：从镜像仓库导入镜像到 ImageStream",
+  "code": "# Import tag latest into a new image stream\noc import-image mystream --from=registry.io/repo/image:latest --confirm\n\n# Update imported data for tag latest in an already existing image stream\noc import-image mystream\n\n# Update imported data for tag stable in an already existing image stream\noc import-image mystream:stable\n\n# Update imported data for all tags in an existing image stream\noc import-image mystream --all\n\n# Update imported data for a tag that points to a manifest list to include the full manifest list\noc import-image mystream --import-mode=PreserveOriginal\n\n# Import all tags into a new image stream\noc import-image mystream --from=registry.io/repo/image --all --confirm\n\n# Import all tags into a new image stream using a custom timeout\noc --request-timeout=5m import-image mystream --from=registry.io/repo/image --all --confirm",
+  "note": "官方说明：Import images from a container image registry"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc kustomize：构建 Kustomize 配置",
+  "code": "# Build the current working directory\noc kustomize\n\n# Build some shared configuration directory\noc kustomize /home/config/production\n\n# Build from github\noc kustomize https://github.com/kubernetes-sigs/kustomize.git/examples/helloWorld?ref=v1.0.6",
+  "note": "官方说明：Build a kustomization target from a directory or URL"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc label：添加 / 修改标签",
+  "code": "# Update pod 'foo' with the label 'unhealthy' and the value 'true'\noc label pods foo unhealthy=true\n\n# Update pod 'foo' with the label 'status' and the value 'unhealthy', overwriting any existing value\noc label --overwrite pods foo status=unhealthy\n\n# Update all pods in the namespace\noc label pods --all status=unhealthy\n\n# Update a pod identified by the type and name in \"pod.json\"\noc label -f pod.json status=unhealthy\n\n# Update pod 'foo' only if the resource is unchanged from version 1\noc label pods foo status=unhealthy --resource-version=1\n\n# Update pod 'foo' by removing a label named 'bar' if it exists\n# Does not require the --overwrite flag\noc label pods foo bar-",
+  "note": "官方说明：Update the labels on a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc login：登录集群",
+  "code": "# Log in interactively\noc login --username=myuser\n\n# Log in to the given server with the given certificate authority file\noc login localhost:8443 --certificate-authority=/path/to/cert.crt\n\n# Log in to the given server with the given credentials (will not prompt interactively)\noc login localhost:8443 --username=myuser --password=mypass\n\n# Log in to the given server through a browser\noc login localhost:8443 --web --callback-port 8280\n\n# Log in to the given server through a browser without opening it automatically (print URL only)\noc login localhost:8443 --web --auto-open-browser=false --callback-port 8280\n\n# Log in to the external OIDC issuer through Auth Code + PKCE by starting a local server listening on port 8080\noc login localhost:8443 --exec-plugin=oc-oidc --client-id=client-id --extra-scopes=email,profile --callback-port=8080",
+  "note": "官方说明：Log in to a server"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc logout：退出登录",
+  "code": "# Log out\noc logout",
+  "note": "官方说明：End the current server session"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc logs：查看容器日志",
+  "code": "# Start streaming the logs of the most recent build of the openldap build config\noc logs -f bc/openldap\n\n# Start streaming the logs of the latest deployment of the mysql deployment config\noc logs -f dc/mysql\n\n# Get the logs of the first deployment for the mysql deployment config. Note that logs\n# from older deployments may not exist either because the deployment was successful\n# or due to deployment pruning or manual deletion of the deployment\noc logs --version=1 dc/mysql\n\n# Return a snapshot of ruby-container logs from pod backend\noc logs backend -c ruby-container\n\n# Start streaming of ruby-container logs from pod backend\noc logs -f pod/backend -c ruby-container",
+  "note": "官方说明：Print the logs for a container in a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc new-app：创建新应用",
+  "code": "# List all local templates and image streams that can be used to create an app\noc new-app --list\n\n# Create an application based on the source code in the current git repository (with a public remote) and a container image\noc new-app . --image=registry/repo/langimage\n\n# Create an application myapp with Docker based build strategy expecting binary input\noc new-app  --strategy=docker --binary --name myapp\n\n# Create a Ruby application based on the provided [image]~[source code] combination\noc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git\n\n# Use the public container registry MySQL image to create an app. Generated artifacts will be labeled with db=mysql\noc new-app mysql MYSQL_USER=user MYSQL_PASSWORD=pass MYSQL_DATABASE=testdb -l db=mysql\n\n# Use a MySQL image in a private registry to create an app and override application artifacts' names\noc new-app --image=myregistry.com/mycompany/mysql --name=private\n\n# Use an image with the full manifest list to create an app and override application artifacts' names\noc new-app --image=myregistry.com/mycompany/image --name=private --import-mode=PreserveOriginal\n\n# Create an application from a remote repository using its beta4 branch\noc new-app https://github.com/openshift/ruby-hello-world#beta4\n\n# Create an application based on a stored template, explicitly setting a parameter value\noc new-app --template=ruby-helloworld-sample --param=MYSQL_USER=admin\n\n# Create an application from a remote repository and specify a context directory\noc new-app https://github.com/youruser/yourgitrepo --context-dir=src/build\n\n# Create an application from a remote private repository and specify which existing secret to use\noc new-app https://github.com/youruser/yourgitrepo --source-secret=yoursecret\n\n# Create an application based on a template file, explicitly setting a parameter value\noc new-app --file=./example/myapp/template.json --param=MYSQL_USER=admin\n\n# Search all templates, image streams, and container images for the ones that match \"ruby\"\noc new-app --search ruby\n\n# Search for \"ruby\", but only in stored templates (--template, --image-stream and --image\n# can be used to filter search results)\noc new-app --search --template=ruby\n\n# Search for \"ruby\" in stored templates and print the output as YAML\noc new-app --search --template=ruby --output=yaml",
+  "note": "官方说明：Create a new application"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc new-build：创建构建配置",
+  "code": "# Create a build config based on the source code in the current git repository (with a public\n# remote) and a container image\noc new-build . --image=repo/langimage\n\n# Create a NodeJS build config based on the provided [image]~[source code] combination\noc new-build centos/nodejs-8-centos7~https://github.com/sclorg/nodejs-ex.git\n\n# Create a build config from a remote repository using its beta2 branch\noc new-build https://github.com/openshift/ruby-hello-world#beta2\n\n# Create a build config using a Dockerfile specified as an argument\noc new-build -D $'FROM centos:7\\nRUN yum install -y httpd'\n\n# Create a build config from a remote repository and add custom environment variables\noc new-build https://github.com/openshift/ruby-hello-world -e RACK_ENV=development\n\n# Create a build config from a remote private repository and specify which existing secret to use\noc new-build https://github.com/youruser/yourgitrepo --source-secret=yoursecret\n\n# Create a build config using  an image with the full manifest list to create an app and override application artifacts' names\noc new-build --image=myregistry.com/mycompany/image --name=private --import-mode=PreserveOriginal\n\n# Create a build config from a remote repository and inject the npmrc into a build\noc new-build https://github.com/openshift/ruby-hello-world --build-secret npmrc:.npmrc\n\n# Create a build config from a remote repository and inject environment data into a build\noc new-build https://github.com/openshift/ruby-hello-world --build-config-map env:config\n\n# Create a build config that gets its input from a remote repository and another container image\noc new-build https://github.com/openshift/ruby-hello-world --source-image=openshift/jenkins-1-centos7 --source-image-path=/var/lib/jenkins:tmp",
+  "note": "官方说明：Create a new build configuration"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc new-project：创建新项目",
+  "code": "# Create a new project with minimal information\noc new-project web-team-dev\n\n# Create a new project with a display name and description\noc new-project web-team-dev --display-name=\"Web Team Development\" --description=\"Development project for the web team.\"",
+  "note": "官方说明：Request a new project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc observe：监听资源变化并触发脚本（实验性）",
+  "code": "# Observe changes to services\noc observe services\n\n# Observe changes to services, including the clusterIP and invoke a script for each\noc observe services --template '{ .spec.clusterIP }' -- register_dns.sh\n\n# Observe changes to services filtered by a label selector\noc observe services -l regist-dns=true --template '{ .spec.clusterIP }' -- register_dns.sh",
+  "note": "官方说明：Observe changes to resources and react to them (experimental)"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc patch：局部更新资源字段",
+  "code": "# Partially update a node using a strategic merge patch, specifying the patch as JSON\noc patch node k8s-node-1 -p '{\"spec\":{\"unschedulable\":true}}'\n\n# Partially update a node using a strategic merge patch, specifying the patch as YAML\noc patch node k8s-node-1 -p $'spec:\\n unschedulable: true'\n\n# Partially update a node identified by the type and name specified in \"node.json\" using strategic merge patch\noc patch -f node.json -p '{\"spec\":{\"unschedulable\":true}}'\n\n# Update a container's image; spec.containers[*].name is required because it's a merge key\noc patch pod valid-pod -p '{\"spec\":{\"containers\":[{\"name\":\"kubernetes-serve-hostname\",\"image\":\"new image\"}]}}'\n\n# Update a container's image using a JSON patch with positional arrays\noc patch pod valid-pod --type='json' -p='[{\"op\": \"replace\", \"path\": \"/spec/containers/0/image\", \"value\":\"new image\"}]'\n\n# Update a deployment's replicas through the 'scale' subresource using a merge patch\noc patch deployment nginx-deployment --subresource='scale' --type='merge' -p '{\"spec\":{\"replicas\":2}}'",
+  "note": "官方说明：Update fields of a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc plugin：插件相关工具",
+  "code": "# List all available plugins\noc plugin list\n\n# List only binary names of available plugins without paths\noc plugin list --name-only",
+  "note": "官方说明：Provides utilities for interacting with plugins"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc plugin list：列出可用的插件",
+  "code": "# List all available plugins\noc plugin list\n\n# List only binary names of available plugins without paths\noc plugin list --name-only",
+  "note": "官方说明：List all visible plugin executables on a user's PATH"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy add-role-to-group：给用户组授予项目角色",
+  "code": "oc policy add-role-to-group ROLE GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Add a role to groups for the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy add-role-to-user：给用户或 ServiceAccount 授予项目角色",
+  "code": "# Add the 'view' role to user1 for the current project\noc policy add-role-to-user view user1\n\n# Add the 'edit' role to serviceaccount1 for the current project\noc policy add-role-to-user edit -z serviceaccount1",
+  "note": "官方说明：Add a role to users or service accounts for the current project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy remove-group：从项目中移除用户组",
+  "code": "oc policy remove-group GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Remove group from the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy remove-role-from-group：收回用户组的项目角色",
+  "code": "oc policy remove-role-from-group ROLE GROUP [GROUP ...] [flags] [options]",
+  "note": "官方说明：Remove a role from groups for the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy remove-role-from-user：收回用户的项目角色",
+  "code": "oc policy remove-role-from-user ROLE USER [USER ...] [flags] [options]",
+  "note": "官方说明：Remove a role from users for the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy remove-user：从项目中移除用户",
+  "code": "oc policy remove-user USER [USER ...] [flags] [options]",
+  "note": "官方说明：Remove user from the project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy scc-review：检查哪个 ServiceAccount 能创建该 Pod",
+  "code": "# Check whether service accounts sa1 and sa2 can admit a pod with a template pod spec specified in my_resource.yaml\n# Service Account specified in myresource.yaml file is ignored\noc policy scc-review -z sa1,sa2 -f my_resource.yaml\n\n# Check whether service accounts system:serviceaccount:bob:default can admit a pod with a template pod spec specified in my_resource.yaml\noc policy scc-review -z system:serviceaccount:bob:default -f my_resource.yaml\n\n# Check whether the service account specified in my_resource_with_sa.yaml can admit the pod\noc policy scc-review -f my_resource_with_sa.yaml\n\n# Check whether the default service account can admit the pod; default is taken since no service account is defined in myresource_with_no_sa.yaml\noc policy scc-review -f myresource_with_no_sa.yaml",
+  "note": "官方说明：Check which service account can create a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy scc-subject-review：检查用户或 ServiceAccount 能否创建该 Pod",
+  "code": "# Check whether user bob can create a pod specified in myresource.yaml\noc policy scc-subject-review -u bob -f myresource.yaml\n\n# Check whether user bob who belongs to projectAdmin group can create a pod specified in myresource.yaml\noc policy scc-subject-review -u bob -g projectAdmin -f myresource.yaml\n\n# Check whether a service account specified in the pod template spec in myresourcewithsa.yaml can create the pod\noc policy scc-subject-review -f myresourcewithsa.yaml",
+  "note": "官方说明：Check whether a user or a service account can create a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc policy who-can：查看谁能对资源执行某操作",
+  "code": "oc policy who-can VERB RESOURCE [NAME] [flags] [options]",
+  "note": "官方说明：List who can perform the specified action on a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc port-forward：端口转发到 Pod",
+  "code": "# Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in the pod\noc port-forward pod/mypod 5000 6000\n\n# Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the deployment\noc port-forward deployment/mydeployment 5000 6000\n\n# Listen on port 8443 locally, forwarding to the targetPort of the service's port named \"https\" in a pod selected by the service\noc port-forward service/myservice 8443:https\n\n# Listen on port 8888 locally, forwarding to 5000 in the pod\noc port-forward pod/mypod 8888:5000\n\n# Listen on port 8888 on all addresses, forwarding to 5000 in the pod\noc port-forward --address 0.0.0.0 pod/mypod 8888:5000\n\n# Listen on port 8888 on localhost and selected IP, forwarding to 5000 in the pod\noc port-forward --address localhost,10.19.21.23 pod/mypod 8888:5000\n\n# Listen on a random port locally, forwarding to 5000 in the pod\noc port-forward pod/mypod :5000",
+  "note": "官方说明：Forward one or more local ports to a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc process：处理模板生成资源列表",
+  "code": "# Convert the template.json file into a resource list and pass to create\noc process -f template.json | oc create -f -\n\n# Process a file locally instead of contacting the server\noc process -f template.json --local -o yaml\n\n# Process template while passing a user-defined label\noc process -f template.json -l name=mytemplate\n\n# Convert a stored template into a resource list\noc process foo\n\n# Convert a stored template into a resource list by setting/overriding parameter values\noc process foo PARM1=VALUE1 PARM2=VALUE2\n\n# Convert a template stored in different namespace into a resource list\noc process openshift//foo\n\n# Convert template.json into a resource list\ncat template.json | oc process -f -",
+  "note": "官方说明：Process a template into list of resources"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc project：切换项目",
+  "code": "# Switch to the 'myapp' project\noc project myapp\n\n# Display the project currently in use\noc project",
+  "note": "官方说明：Switch to another project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc projects：列出项目",
+  "code": "# List all projects\noc projects",
+  "note": "官方说明：Display existing projects"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc proxy：启动到 API 服务器的本地代理",
+  "code": "# To proxy all of the Kubernetes API and nothing else\noc proxy --api-prefix=/\n\n# To proxy only part of the Kubernetes API and also some static files\n# You can get pods info with 'curl localhost:8001/api/v1/pods'\noc proxy --www=/my/files --www-prefix=/static/ --api-prefix=/api/\n\n# To proxy the entire Kubernetes API at a different root\n# You can get pods info with 'curl localhost:8001/custom/api/v1/pods'\noc proxy --api-prefix=/custom/\n\n# Run a proxy to the Kubernetes API server on port 8011, serving static content from ./local/www/\noc proxy --port=8011 --www=./local/www/\n\n# Run a proxy to the Kubernetes API server on an arbitrary local port\n# The chosen port for the server will be output to stdout\noc proxy --port=0\n\n# Run a proxy to the Kubernetes API server, changing the API prefix to k8s-api\n# This makes e.g. the pods API available at localhost:8001/k8s-api/v1/pods/\noc proxy --api-prefix=/k8s-api",
+  "note": "官方说明：Run a proxy to the Kubernetes API server"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc registry login：登录集群内部镜像仓库",
+  "code": "# Log in to the integrated registry\noc registry login\n\n# Log in to different registry using BASIC auth credentials\noc registry login --registry quay.io/myregistry --auth-basic=USER:PASS",
+  "note": "官方说明：Log in to the integrated registry"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc replace：按文件替换资源",
+  "code": "# Replace a pod using the data in pod.json\noc replace -f ./pod.json\n\n# Replace a pod based on the JSON passed into stdin\ncat pod.json | oc replace -f -\n\n# Update a single-container pod's image version (tag) to v4\noc get pod mypod -o yaml | sed 's/\\(image: myimage\\):.*$/\\1:v4/' | oc replace -f -\n\n# Force replace, delete and then re-create the resource\noc replace --force -f ./pod.json",
+  "note": "官方说明：Replace a resource by file name or stdin"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollback：回滚 DeploymentConfig 到之前的部署",
+  "code": "# Perform a rollback to the last successfully completed deployment for a deployment config\noc rollback frontend\n\n# See what a rollback to version 3 will look like, but do not perform the rollback\noc rollback frontend --to-version=3 --dry-run\n\n# Perform a rollback to a specific deployment\noc rollback frontend-2\n\n# Perform the rollback manually by piping the JSON of the new config back to oc\noc rollback frontend -o json | oc replace dc/frontend -f -\n\n# Print the updated deployment configuration in JSON format instead of performing the rollback\noc rollback frontend -o json",
+  "note": "官方说明：Revert part of an application back to a previous deployment"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout：管理发布",
+  "code": "# Roll back to the previous deployment\noc rollout undo deployment/abc\n\n# Check the rollout status of a daemonset\noc rollout status daemonset/foo\n\n# Restart a deployment\noc rollout restart deployment/abc\n\n# Restart deployments with the 'app=nginx' label\noc rollout restart deployment --selector=app=nginx",
+  "note": "官方说明：Manage the rollout of a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout cancel：取消进行中的 DeploymentConfig 部署",
+  "code": "# Cancel the in-progress deployment based on 'nginx'\noc rollout cancel dc/nginx",
+  "note": "官方说明：Cancel the in-progress deployment"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout history：查看发布历史",
+  "code": "# View the rollout history of a deployment\noc rollout history deployment/abc\n\n# View the details of daemonset revision 3\noc rollout history daemonset/abc --revision=3",
+  "note": "官方说明：View rollout history"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout latest：为 DeploymentConfig 触发新部署",
+  "code": "# Start a new rollout based on the latest images defined in the image change triggers\noc rollout latest dc/nginx\n\n# Print the rolled out deployment config\noc rollout latest dc/nginx -o json",
+  "note": "官方说明：Start a new rollout for a deployment config with the latest state from its triggers"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout pause：暂停发布",
+  "code": "# Mark the nginx deployment as paused\n# Any current state of the deployment will continue its function; new updates\n# to the deployment will not have an effect as long as the deployment is paused\noc rollout pause deployment/nginx",
+  "note": "官方说明：Mark the provided resource as paused"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout restart：重启（滚动重建）资源",
+  "code": "# Restart all deployments in the test-namespace namespace\noc rollout restart deployment -n test-namespace\n\n# Restart a deployment\noc rollout restart deployment/nginx\n\n# Restart a daemon set\noc rollout restart daemonset/abc\n\n# Restart deployments with the app=nginx label\noc rollout restart deployment --selector=app=nginx",
+  "note": "官方说明：Restart a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout resume：恢复已暂停的发布",
+  "code": "# Resume an already paused deployment\noc rollout resume deployment/nginx",
+  "note": "官方说明：Resume a paused resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout retry：重试失败的 DeploymentConfig 部署",
+  "code": "# Retry the latest failed deployment based on 'frontend'\n# The deployer pod and any hook pods are deleted for the latest failed deployment\noc rollout retry dc/frontend",
+  "note": "官方说明：Retry the latest failed rollout"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout status：查看发布状态",
+  "code": "# Watch the rollout status of a deployment\noc rollout status deployment/nginx",
+  "note": "官方说明：Show the status of the rollout"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rollout undo：回滚发布",
+  "code": "# Roll back to the previous deployment\noc rollout undo deployment/abc\n\n# Roll back to daemonset revision 3\noc rollout undo daemonset/abc --to-revision=3\n\n# Roll back to the previous deployment with dry-run\noc rollout undo --dry-run=server deployment/abc",
+  "note": "官方说明：Undo a previous rollout"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rsh：进入容器 shell",
+  "code": "# Open a shell session on the first container in pod 'foo'\noc rsh foo\n\n# Open a shell session on the first container in pod 'foo' and namespace 'bar'\n# (Note that oc client specific arguments must come before the resource name and its arguments)\noc rsh -n bar foo\n\n# Run the command 'cat /etc/resolv.conf' inside pod 'foo'\noc rsh foo cat /etc/resolv.conf\n\n# See the configuration of your internal registry\noc rsh dc/docker-registry cat config.yml\n\n# Open a shell session on the container named 'index' inside a pod of your job\noc rsh -c index job/scheduled",
+  "note": "官方说明：Start a shell session in a container"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc rsync：在本地和 Pod 之间同步文件",
+  "code": "# Synchronize a local directory with a pod directory\noc rsync ./local/dir/ POD:/remote/dir\n\n# Synchronize a pod directory with a local directory\noc rsync POD:/remote/dir/ ./local/dir",
+  "note": "官方说明：Copy files between a local file system and a pod"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc run：在集群上运行一个镜像",
+  "code": "# Start a nginx pod\noc run nginx --image=nginx\n\n# Start a hazelcast pod and let the container expose port 5701\noc run hazelcast --image=hazelcast/hazelcast --port=5701\n\n# Start a hazelcast pod and set environment variables \"DNS_DOMAIN=cluster\" and \"POD_NAMESPACE=default\" in the container\noc run hazelcast --image=hazelcast/hazelcast --env=\"DNS_DOMAIN=cluster\" --env=\"POD_NAMESPACE=default\"\n\n# Start a hazelcast pod and set labels \"app=hazelcast\" and \"env=prod\" in the container\noc run hazelcast --image=hazelcast/hazelcast --labels=\"app=hazelcast,env=prod\"\n\n# Dry run; print the corresponding API objects without creating them\noc run nginx --image=nginx --dry-run=client\n\n# Start a nginx pod, but overload the spec with a partial set of values parsed from JSON\noc run nginx --image=nginx --overrides='{ \"apiVersion\": \"v1\", \"spec\": { ... } }'\n\n# Start a busybox pod and keep it in the foreground, don't restart it if it exits\noc run -i -t busybox --image=busybox --restart=Never\n\n# Start the nginx pod using the default command, but use custom arguments (arg1 .. argN) for that command\noc run nginx --image=nginx -- <arg1> <arg2> ... <argN>\n\n# Start the nginx pod using a different command and custom arguments\noc run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>",
+  "note": "官方说明：Run a particular image on the cluster"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc scale：扩缩容",
+  "code": "# Scale a replica set named 'foo' to 3\noc scale --replicas=3 rs/foo\n\n# Scale a resource identified by type and name specified in \"foo.yaml\" to 3\noc scale --replicas=3 -f foo.yaml\n\n# If the deployment named mysql's current size is 2, scale mysql to 3\noc scale --current-replicas=2 --replicas=3 deployment/mysql\n\n# Scale multiple replication controllers\noc scale --replicas=5 rc/example1 rc/example2 rc/example3\n\n# Scale stateful set named 'web' to 3\noc scale --replicas=3 statefulset/web",
+  "note": "官方说明：Set a new size for a deployment, replica set, or replication controller"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc secrets link：把 Secret 关联到 ServiceAccount",
+  "code": "# Add an image pull secret to a service account to automatically use it for pulling pod images\noc secrets link serviceaccount-name pull-secret --for=pull\n\n# Add an image pull secret to a service account to automatically use it for both pulling and pushing build images\noc secrets link builder builder-image-secret --for=pull,mount",
+  "note": "官方说明：Link secrets to a service account"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc secrets unlink：取消 Secret 与 ServiceAccount 的关联",
+  "code": "# Unlink a secret currently associated with a service account\noc secrets unlink serviceaccount-name secret-name another-secret-name ...",
+  "note": "官方说明：Detach secrets from a service account"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set build-hook：设置构建钩子",
+  "code": "# Clear post-commit hook on a build config\noc set build-hook bc/mybuild --post-commit --remove\n\n# Set the post-commit hook to execute a test suite using a new entrypoint\noc set build-hook bc/mybuild --post-commit --command -- /bin/bash -c /var/lib/test-image.sh\n\n# Set the post-commit hook to execute a shell script\noc set build-hook bc/mybuild --post-commit --script=\"/var/lib/test-image.sh param1 param2 && /var/lib/done.sh\"",
+  "note": "官方说明：Update a build hook on a build config"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set build-secret：设置构建使用的 Secret",
+  "code": "# Clear the push secret on a build config\noc set build-secret --push --remove bc/mybuild\n\n# Set the pull secret on a build config\noc set build-secret --pull bc/mybuild mysecret\n\n# Set the push and pull secret on a build config\noc set build-secret --push --pull bc/mybuild mysecret\n\n# Set the source secret on a set of build configs matching a selector\noc set build-secret --source -l app=myapp gitsecret",
+  "note": "官方说明：Update a build secret on a build config"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set data：修改 ConfigMap / Secret 的数据",
+  "code": "# Set the 'password' key of a secret\noc set data secret/foo password=this_is_secret\n\n# Remove the 'password' key from a secret\noc set data secret/foo password-\n\n# Update the 'haproxy.conf' key of a config map from a file on disk\noc set data configmap/bar --from-file=../haproxy.conf\n\n# Update a secret with the contents of a directory, one key per file\noc set data secret/foo --from-file=secret-dir",
+  "note": "官方说明：Update the data within a config map or secret"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set deployment-hook：设置 DeploymentConfig 部署钩子",
+  "code": "# Clear pre and post hooks on a deployment config\noc set deployment-hook dc/myapp --remove --pre --post\n\n# Set the pre deployment hook to execute a db migration command for an application\n# using the data volume from the application\noc set deployment-hook dc/myapp --pre --volumes=data -- /var/lib/migrate-db.sh\n\n# Set a mid deployment hook along with additional environment variables\noc set deployment-hook dc/myapp --mid --volumes=data -e VAR1=value1 -e VAR2=value2 -- /var/lib/prepare-deploy.sh",
+  "note": "官方说明：Update a deployment hook on a deployment config"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set env：设置环境变量",
+  "code": "# Update deployment config 'myapp' with a new environment variable\noc set env dc/myapp STORAGE_DIR=/local\n\n# List the environment variables defined on a build config 'sample-build'\noc set env bc/sample-build --list\n\n# List the environment variables defined on all pods\noc set env pods --all --list\n\n# Output modified build config in YAML\noc set env bc/sample-build STORAGE_DIR=/data -o yaml\n\n# Update all containers in all replication controllers in the project to have ENV=prod\noc set env rc --all ENV=prod\n\n# Import environment from a secret\noc set env --from=secret/mysecret dc/myapp\n\n# Import environment from a config map with a prefix\noc set env --from=configmap/myconfigmap --prefix=MYSQL_ dc/myapp\n\n# Remove the environment variable ENV from container 'c1' in all deployment configs\noc set env dc --all --containers=\"c1\" ENV-\n\n# Remove the environment variable ENV from a deployment config definition on disk and\n# update the deployment config on the server\noc set env -f dc.json ENV-\n\n# Set some of the local shell environment into a deployment config on the server\noc set env | grep RAILS_ | oc env -e - dc/myapp",
+  "note": "官方说明：Update environment variables on a pod template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set image：更新镜像",
+  "code": "# Set a deployment config's nginx container image to 'nginx:1.9.1', and its busybox container image to 'busybox'.\noc set image dc/nginx busybox=busybox nginx=nginx:1.9.1\n\n# Set a deployment config's app container image to the image referenced by the imagestream tag 'openshift/ruby:2.3'.\noc set image dc/myapp app=openshift/ruby:2.3 --source=imagestreamtag\n\n# Update all deployments' and rc's nginx container's image to 'nginx:1.9.1'\noc set image deployments,rc nginx=nginx:1.9.1 --all\n\n# Update image of all containers of daemonset abc to 'nginx:1.9.1'\noc set image daemonset abc *=nginx:1.9.1\n\n# Print result (in YAML format) of updating nginx container image from local file, without hitting the server\noc set image -f path/to/file.yaml nginx=nginx:1.9.1 --local -o yaml",
+  "note": "官方说明：Update the image of a pod template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set image-lookup：设置部署时如何解析 ImageStream 镜像",
+  "code": "# Print all of the image streams and whether they resolve local names\noc set image-lookup\n\n# Use local name lookup on image stream mysql\noc set image-lookup mysql\n\n# Force a deployment to use local name lookup\noc set image-lookup deploy/mysql\n\n# Show the current status of the deployment lookup\noc set image-lookup deploy/mysql --list\n\n# Disable local name lookup on image stream mysql\noc set image-lookup mysql --enabled=false\n\n# Set local name lookup on all image streams\noc set image-lookup --all",
+  "note": "官方说明：Change how images are resolved when deploying applications"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set probe：设置健康检查探针",
+  "code": "# Clear both readiness and liveness probes off all containers\noc set probe dc/myapp --remove --readiness --liveness\n\n# Set an exec action as a liveness probe to run 'echo ok'\noc set probe dc/myapp --liveness -- echo ok\n\n# Set a readiness probe to try to open a TCP socket on 3306\noc set probe rc/mysql --readiness --open-tcp=3306\n\n# Set an HTTP startup probe for port 8080 and path /healthz over HTTP on the pod IP\noc set probe dc/webapp --startup --get-url=http://:8080/healthz\n\n# Set an HTTP readiness probe for port 8080 and path /healthz over HTTP on the pod IP\noc set probe dc/webapp --readiness --get-url=http://:8080/healthz\n\n# Set an HTTP readiness probe over HTTPS on 127.0.0.1 for a hostNetwork pod\noc set probe dc/router --readiness --get-url=https://127.0.0.1:1936/stats\n\n# Set only the initial-delay-seconds field on all deployments\noc set probe dc --all --readiness --initial-delay-seconds=30",
+  "note": "官方说明：Update a probe on a pod template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set resources：设置资源 requests / limits",
+  "code": "# Set a deployments nginx container CPU limits to \"200m and memory to 512Mi\"\noc set resources deployment nginx -c=nginx --limits=cpu=200m,memory=512Mi\n\n# Set the resource request and limits for all containers in nginx\noc set resources deployment nginx --limits=cpu=200m,memory=512Mi --requests=cpu=100m,memory=256Mi\n\n# Remove the resource requests for resources on containers in nginx\noc set resources deployment nginx --limits=cpu=0,memory=0 --requests=cpu=0,memory=0\n\n# Print the result (in YAML format) of updating nginx container limits locally, without hitting the server\noc set resources -f path/to/file.yaml --limits=cpu=200m,memory=512Mi --local -o yaml",
+  "note": "官方说明：Update resource requests/limits on objects with pod templates"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set route-backends：设置 Route 后端与流量权重",
+  "code": "# Print the backends on the route 'web'\noc set route-backends web\n\n# Set two backend services on route 'web' with 2/3rds of traffic going to 'a'\noc set route-backends web a=2 b=1\n\n# Increase the traffic percentage going to b by 10%% relative to a\noc set route-backends web --adjust b=+10%%\n\n# Set traffic percentage going to b to 10%% of the traffic going to a\noc set route-backends web --adjust b=10%%\n\n# Set weight of b to 10\noc set route-backends web --adjust b=10\n\n# Set the weight to all backends to zero\noc set route-backends web --zero",
+  "note": "官方说明：Update the backends for a route"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set selector：设置资源的选择器",
+  "code": "# Set the labels and selector before creating a deployment/service pair.\noc create service clusterip my-svc --clusterip=\"None\" -o yaml --dry-run | oc set selector --local -f - 'environment=qa' -o yaml | oc create -f -\noc create deployment my-dep -o yaml --dry-run | oc label --local -f - environment=qa -o yaml | oc create -f -",
+  "note": "官方说明：Set the selector on a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set serviceaccount：设置资源使用的 ServiceAccount",
+  "code": "# Set deployment nginx-deployment's service account to serviceaccount1\noc set serviceaccount deployment nginx-deployment serviceaccount1\n\n# Print the result (in YAML format) of updated nginx deployment with service account from a local file, without hitting the API server\noc set sa -f nginx-deployment.yaml serviceaccount1 --local --dry-run -o yaml",
+  "note": "官方说明：Update the service account of a resource"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set subject：修改角色绑定中的用户 / 组 / ServiceAccount",
+  "code": "# Update a cluster role binding for serviceaccount1\noc set subject clusterrolebinding admin --serviceaccount=namespace:serviceaccount1\n\n# Update a role binding for user1, user2, and group1\noc set subject rolebinding admin --user=user1 --user=user2 --group=group1\n\n# Print the result (in YAML format) of updating role binding subjects locally, without hitting the server\noc create rolebinding admin --role=admin --user=admin -o yaml --dry-run | oc set subject --local -f - --user=foo -o yaml",
+  "note": "官方说明：Update the user, group, or service account in a role binding or cluster role binding"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set triggers：设置自动触发器",
+  "code": "# Print the triggers on the deployment config 'myapp'\noc set triggers dc/myapp\n\n# Set all triggers to manual\noc set triggers dc/myapp --manual\n\n# Enable all automatic triggers\noc set triggers dc/myapp --auto\n\n# Reset the GitHub webhook on a build to a new, generated secret\noc set triggers bc/webapp --from-github\noc set triggers bc/webapp --from-webhook\n\n# Remove all triggers\noc set triggers bc/webapp --remove-all\n\n# Stop triggering on config change\noc set triggers dc/myapp --from-config --remove\n\n# Add an image trigger to a build config\noc set triggers bc/webapp --from-image=namespace1/image:latest\n\n# Add an image trigger to a stateful set on the main container\noc set triggers statefulset/db --from-image=namespace1/image:latest -c main",
+  "note": "官方说明：Update the triggers on one or more objects"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc set volumes：管理 Pod 模板中的卷",
+  "code": "# List volumes defined on all deployment configs in the current project\noc set volume dc --all\n\n# Add a new empty dir volume to deployment config (dc) 'myapp' mounted under\n# /var/lib/myapp\noc set volume dc/myapp --add --mount-path=/var/lib/myapp\n\n# Use an existing persistent volume claim (PVC) to overwrite an existing volume 'v1'\noc set volume dc/myapp --add --name=v1 -t pvc --claim-name=pvc1 --overwrite\n\n# Remove volume 'v1' from deployment config 'myapp'\noc set volume dc/myapp --remove --name=v1\n\n# Create a new persistent volume claim that overwrites an existing volume 'v1'\noc set volume dc/myapp --add --name=v1 -t pvc --claim-size=1G --overwrite\n\n# Change the mount point for volume 'v1' to /data\noc set volume dc/myapp --add --name=v1 -m /data --overwrite\n\n# Modify the deployment config by removing volume mount \"v1\" from container \"c1\"\n# (and by removing the volume \"v1\" if no other containers have volume mounts that reference it)\noc set volume dc/myapp --remove --name=v1 --containers=c1\n\n# Add new volume based on a more complex volume source (AWS EBS, GCE PD,\n# Ceph, Gluster, NFS, ISCSI, ...)\noc set volume dc/myapp --add -m /data --source=<json-string>",
+  "note": "官方说明：Update volumes on a pod template"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc start-build：启动构建",
+  "code": "# Starts build from build config \"hello-world\"\noc start-build hello-world\n\n# Starts build from a previous build \"hello-world-1\"\noc start-build --from-build=hello-world-1\n\n# Use the contents of a directory as build input\noc start-build hello-world --from-dir=src/\n\n# Send the contents of a Git repository to the server from tag 'v2'\noc start-build hello-world --from-repo=../hello-world --commit=v2\n\n# Start a new build for build config \"hello-world\" and watch the logs until the build\n# completes or fails\noc start-build hello-world --follow\n\n# Start a new build for build config \"hello-world\" and wait until the build completes. It\n# exits with a non-zero return code if the build fails\noc start-build hello-world --wait",
+  "note": "官方说明：Start a new build"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc status：查看当前项目概览",
+  "code": "# See an overview of the current project\noc status\n\n# Export the overview of the current project in an svg file\noc status -o dot | dot -T svg -o project.svg\n\n# See an overview of the current project including details for any identified issues\noc status --suggest",
+  "note": "官方说明：Show an overview of the current project"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc tag：给镜像打标签到 ImageStream",
+  "code": "# Tag the current image for the image stream 'openshift/ruby' and tag '2.0' into the image stream 'yourproject/ruby with tag 'tip'\noc tag openshift/ruby:2.0 yourproject/ruby:tip\n\n# Tag a specific image\noc tag openshift/ruby@sha256:6b646fa6bf5e5e4c7fa41056c27910e679c03ebe7f93e361e6515a9da7e258cc yourproject/ruby:tip\n\n# Tag an external container image\noc tag --source=docker openshift/origin-control-plane:latest yourproject/ruby:tip\n\n# Tag an external container image and request pullthrough for it\noc tag --source=docker openshift/origin-control-plane:latest yourproject/ruby:tip --reference-policy=local\n\n# Tag an external container image and include the full manifest list\noc tag --source=docker openshift/origin-control-plane:latest yourproject/ruby:tip --import-mode=PreserveOriginal\n\n# Remove the specified spec tag from an image stream\noc tag openshift/origin-control-plane:latest -d",
+  "note": "官方说明：Tag existing images into image streams"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc version：查看客户端与服务端版本",
+  "code": "# Print the OpenShift client, kube-apiserver, and openshift-apiserver version information for the current context\noc version\n\n# Print the OpenShift client, kube-apiserver, and openshift-apiserver version numbers for the current context in JSON format\noc version --output json\n\n# Print the OpenShift client version information for the current context\noc version --client",
+  "note": "官方说明：Print the client and server version information"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc wait：等待资源达到某个条件",
+  "code": "# Wait for the pod \"busybox1\" to contain the status condition of type \"Ready\"\noc wait --for=condition=Ready pod/busybox1\n\n# The default value of status condition is true; you can wait for other targets after an equal delimiter (compared after Unicode simple case folding, which is a more general form of case-insensitivity)\noc wait --for=condition=Ready=false pod/busybox1\n\n# Wait for the pod \"busybox1\" to contain the status phase to be \"Running\"\noc wait --for=jsonpath='{.status.phase}'=Running pod/busybox1\n\n# Wait for pod \"busybox1\" to be Ready\noc wait --for='jsonpath={.status.conditions[?(@.type==\"Ready\")].status}=True' pod/busybox1\n\n# Wait for the service \"loadbalancer\" to have ingress\noc wait --for=jsonpath='{.status.loadBalancer.ingress}' service/loadbalancer\n\n# Wait for the secret \"busybox1\" to be created, with a timeout of 30s\noc create secret generic busybox1\noc wait --for=create secret/busybox1 --timeout=30s\n\n# Wait for the pod \"busybox1\" to be deleted, with a timeout of 60s, after having issued the \"delete\" command\noc delete pod/busybox1\noc wait --for=delete pod/busybox1 --timeout=60s",
+  "note": "官方说明：Wait for a specific condition on one or many resources"
+ },
+ {
+  "category": "OpenShift 命令大全",
+  "title": "oc whoami：查看当前会话信息",
+  "code": "# Display the currently authenticated user\noc whoami",
+  "note": "官方说明：Return information about the current session"
  }
 ]

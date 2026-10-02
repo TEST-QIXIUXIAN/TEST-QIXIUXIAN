@@ -435,7 +435,8 @@ static void send_page(sock_t s, int head_only)
 {
     send_parts(s, PAGE_PARTS, "text/html; charset=utf-8",
                "Content-Security-Policy: default-src 'self'; script-src 'unsafe-inline'; "
-               "style-src 'unsafe-inline'; img-src 'self' data:\r\n"
+               "style-src 'unsafe-inline'; img-src 'self' data:; "
+               "connect-src 'self' https://raw.githubusercontent.com\r\n"
                "Referrer-Policy: no-referrer\r\n",
                head_only);
 }

@@ -64,7 +64,7 @@ textarea.code{min-height:200px;font-family:"Cascadia Mono",Consolas,"Courier New
 <button class="btn" id="exportMd" title="按分类导出为 Markdown 文档">导出 MD</button>
 <button class="btn" id="exportJson" title="导出为 JSON，可用于备份和导入">导出 JSON</button>
 <button class="btn" id="importBtn" title="导入本程序导出的 JSON（自动跳过重复）">导入</button>
-<button class="btn" id="seedBtn" title="把程序内置的常用命令补充到你的记录中（自动跳过已有的）">补充内置命令</button>
+<button class="btn" id="seedBtn" title="从内置命令和在线命令库补充缺少的命令（自动跳过已有的）">更新命令库</button>
 <input type="file" id="importFile" accept=".json,application/json" hidden>
 </header>
 
@@ -97,7 +97,11 @@ textarea.code{min-height:200px;font-family:"Cascadia Mono",Consolas,"Courier New
 'use strict';
 var ALL = '全部';
 var DEFAULT_CATS = ['Docker', 'Docker 镜像', 'Dockerfile', 'Docker Compose', 'Kubernetes', 'K8s YAML 模板', 'Helm',
-  'Podman', 'containerd / crictl', '镜像仓库', '网络与存储', '排障调试', 'Windows 与 WSL', '其他'];
+  'OpenShift', 'OpenShift 管理', 'OpenShift 命令大全', 'Podman', 'containerd / crictl', '镜像仓库', '网络与存储',
+  '排障调试', 'Windows 与 WSL', '其他'];
+// Online command library: the seed.json in the project's GitHub repo, kept up to date by a scheduled job.
+var UPDATE_URL = 'https://raw.githubusercontent.com/test-qixiuxian/TEST-QIXIUXIAN/claude/relaxed-lamport-urrt8l/container-notes/seed.json';
+var CHECK_KEY = 'cn-update-checked', SEEN_KEY = 'cn-update-seen';
 var items = [], cur = ALL, words = [];
 var $ = function (s) { return document.querySelector(s); };
 var dlg = $('#dlg'), form = $('#form');
@@ -310,18 +314,55 @@ $('#importFile').addEventListener('change', function (e) {
     return importList(list).then(function (n) { toast('导入 ' + n.added + ' 条，跳过重复 ' + n.skipped + ' 条'); });
   });
 });
-$('#seedBtn').addEventListener('click', function () {
-  var b = this;
-  b.disabled = true;
-  api('/api/seed').then(function (list) {
-    return importList(list).then(function (n) {
-      toast(n.added ? '新增内置命令 ' + n.added + ' 条（已有的 ' + n.skipped + ' 条已跳过）' : '内置命令都已经在你的记录里了');
+function keyOf(r) { return r.title + '\u0000' + r.code; }
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+// fetches the online library; resolves to a cleaned array, rejects when offline or malformed
+function fetchRemote() {
+  return fetch(UPDATE_URL, { cache: 'no-store' }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (list) {
+    if (!Array.isArray(list)) throw new Error('bad format');
+    return list.slice(0, 5000).filter(function (r) {
+      return r && typeof r.title === 'string' && typeof r.code === 'string' && r.title.length <= 200 && r.code.length <= 20000;
     });
-  }).catch(function (err) { alert('读取内置命令失败：' + err.message); })
+  });
+}
+// remembers every online entry already offered, so commands the user deleted are not added back
+function markSeen(list) {
+  var seen = {};
+  try { (JSON.parse(store(SEEN_KEY)) || []).forEach(function (k) { seen[k] = 1; }); } catch (e) {}
+  list.forEach(function (r) { seen[keyOf(r)] = 1; });
+  store(SEEN_KEY, JSON.stringify(Object.keys(seen)));
+  store(CHECK_KEY, String(Date.now()));
+}
+// at most once a day: silently add new commands from the online library
+function autoUpdate() {
+  try { localStorage.setItem('cn-probe', '1'); localStorage.removeItem('cn-probe'); } catch (e) { return; } // no storage
+  if (Date.now() - (+store(CHECK_KEY) || 0) < 20 * 3600 * 1000) return;
+  fetchRemote().then(function (remote) {
+    var seen = {};
+    try { (JSON.parse(store(SEEN_KEY)) || []).forEach(function (k) { seen[k] = 1; }); } catch (e) {}
+    var fresh = remote.filter(function (r) { return !seen[keyOf(r)]; });
+    return importList(fresh).then(function (n) {
+      markSeen(remote);
+      if (n.added) toast('命令库已自动更新：新增 ' + n.added + ' 条');
+    });
+  }).catch(function () { /* offline or blocked: try again next time */ });
+}
+$('#seedBtn').addEventListener('click', function () {
+  var b = this, online = true;
+  b.disabled = true;
+  Promise.all([api('/api/seed'), fetchRemote().catch(function () { online = false; return []; })]).then(function (r) {
+    return importList(r[0].concat(r[1])).then(function (n) {
+      if (online) markSeen(r[1]);
+      toast((n.added ? '新增 ' + n.added + ' 条命令' : '没有新命令，已是最新') + (online ? '' : '（在线命令库连接失败，只检查了内置命令）'));
+    });
+  }).catch(function (err) { alert('更新失败：' + err.message); })
     .then(function () { b.disabled = false; });
 });
 
-load();
+load().then(autoUpdate);
 })();
 </script>
 </body>

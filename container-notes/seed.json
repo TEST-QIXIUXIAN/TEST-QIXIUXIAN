@@ -4006,5 +4006,29 @@
   "title": "报错 exec [POD] [COMMAND] is not supported anymore",
   "code": "# 错误写法（命令前少了 --）\noc exec -it <pod名> -n <项目名> sh\n\n# 正确写法\noc exec -it <pod名> -n <项目名> -- sh\noc exec -it <pod名> -n <项目名> -c <容器名> -- sh\n\n# 或者用 rsh（不需要 --）\noc rsh -n <项目名> <pod名>",
   "note": "新版 oc / kubectl 要求用 -- 把要在容器里执行的命令和 oc 自己的参数分开。kubectl exec 同样适用。多容器 Pod 不加 -c 时进入第一个容器"
+ },
+ {
+  "category": "常用重点",
+  "title": "进入 Pod 的 shell（oc exec -it … -- sh）",
+  "code": "oc exec -it <pod名> -n <项目名> -- sh\noc exec -it <pod名> -n <项目名> -- bash",
+  "note": "命令（sh / bash）前面必须有 --，否则报错 exec [POD] [COMMAND] is not supported anymore。镜像里没有 bash 时用 sh"
+ },
+ {
+  "category": "常用重点",
+  "title": "进入多容器 Pod 的指定容器（-c）",
+  "code": "# 1. 先查 Pod 里有哪些容器\noc get pod <pod名> -n <项目名> -o jsonpath=\"{.spec.containers[*].name}\"\n\n# 2. 用 -c 指定容器进入\noc exec -it <pod名> -n <项目名> -c <容器名> -- sh",
+  "note": "不加 -c 时默认进入第一个容器"
+ },
+ {
+  "category": "常用重点",
+  "title": "最快进入 Pod（oc rsh，不用写 --）",
+  "code": "oc rsh -n <项目名> <pod名>\noc rsh -n <项目名> -c <容器名> <pod名>",
+  "note": "-n、-c 要写在 Pod 名前面；默认进入 /bin/sh"
+ },
+ {
+  "category": "常用重点",
+  "title": "报错 exec [POD] [COMMAND] is not supported anymore 怎么改",
+  "code": "# 错误：oc exec -it <pod名> -n <项目名> sh\n# 正确：\noc exec -it <pod名> -n <项目名> -- sh",
+  "note": "在要执行的命令前加 --；kubectl exec 同理"
  }
 ]

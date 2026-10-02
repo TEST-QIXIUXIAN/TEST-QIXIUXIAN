@@ -32,6 +32,7 @@ aside{position:sticky;top:78px;align-self:start;display:flex;flex-direction:colu
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .card h3{margin:0;font-size:16px;flex:1;min-width:160px}
+.card.pinned{border-color:var(--accent)}
 .tag{font-size:12px;padding:1px 9px;border-radius:999px;background:var(--accent-weak);color:var(--accent);white-space:nowrap}
 .actions{display:flex;gap:6px}
 pre{margin:10px 0 0;padding:12px 14px;background:var(--code-bg);color:var(--code-text);border-radius:8px;overflow:auto;font:13.5px/1.55 "Cascadia Mono",Consolas,"Courier New",monospace;white-space:pre}
@@ -96,7 +97,8 @@ textarea.code{min-height:200px;font-family:"Cascadia Mono",Consolas,"Courier New
 (function () {
 'use strict';
 var ALL = '全部';
-var DEFAULT_CATS = ['Docker', 'Docker 镜像', 'Dockerfile', 'Docker Compose', 'Kubernetes', 'K8s YAML 模板', 'Helm',
+var PINNED = '常用重点';
+var DEFAULT_CATS = [PINNED, 'Docker', 'Docker 镜像', 'Dockerfile', 'Docker Compose', 'Kubernetes', 'K8s YAML 模板', 'Helm',
   'OpenShift', 'OpenShift 管理', 'OpenShift 命令大全', 'Podman', 'containerd / crictl', '镜像仓库', '网络与存储',
   '排障调试', 'Windows 与 WSL', '其他'];
 // Online command library: the seed.json in the project's GitHub repo, kept up to date by a scheduled job.
@@ -188,7 +190,9 @@ function render() {
   var shown = items.filter(match), rank = {};
   if (words.length) shown.forEach(function (it) { rank[it.id] = score(it); });
   shown.sort(function (a, b) {
-    return ((rank[b.id] || 0) - (rank[a.id] || 0)) || (b.updated - a.updated) || (a.id - b.id);
+    return ((rank[b.id] || 0) - (rank[a.id] || 0)) ||
+      ((b.category === PINNED) - (a.category === PINNED)) || // key commands first
+      (b.updated - a.updated) || (a.id - b.id);
   });
   $('#summary').textContent = (cur === ALL ? '全部分类' : cur) + ' · ' + shown.length + ' 条' +
     (words.length ? '（搜索：' + words.join(' ') + '）' : '');
@@ -197,7 +201,7 @@ function render() {
     return;
   }
   $('#list').innerHTML = shown.map(function (it) {
-    return '<article class="card" data-id="' + it.id + '"><div class="card-head"><span class="tag">' + esc(it.category) +
+    return '<article class="card' + (it.category === PINNED ? ' pinned' : '') + '" data-id="' + it.id + '"><div class="card-head"><span class="tag">' + esc(it.category) +
       '</span><h3>' + hl(it.title || '（无标题）') + '</h3><div class="actions">' +
       '<button class="btn small" data-act="copy" title="复制命令到剪贴板">复制</button>' +
       '<button class="btn small" data-act="edit">编辑</button>' +

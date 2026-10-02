@@ -112,10 +112,11 @@ function esc(s) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
   });
 }
+function escRe(w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 // escape + wrap search hits in <mark>
 function hl(s) {
   if (!words.length) return esc(s);
-  var re = new RegExp('(' + words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')', 'gi');
+  var re = new RegExp('(' + words.map(escRe).join('|') + ')', 'gi');
   return String(s).split(re).map(function (p, i) { return i % 2 ? '<mark>' + esc(p) + '</mark>' : esc(p); }).join('');
 }
 function toast(msg) {
@@ -156,6 +157,20 @@ function match(it) {
   var h = (it.title + '\n' + it.code + '\n' + it.note + '\n' + it.category).toLowerCase();
   return words.every(function (w) { return h.indexOf(w) >= 0; });
 }
+// relevance: the query exactly as typed > every word as a whole word (so "sh" does not
+// count inside "PowerShell", nor "-n" inside "--namespace") > words only as substrings
+function score(it) {
+  var phrase = words.join(' '), s = 0;
+  var title = it.title.toLowerCase(), code = it.code.toLowerCase().replace(/[ \t]+/g, ' ');
+  var hay = title + '\n' + code + '\n' + it.note.toLowerCase();
+  if (code.indexOf(phrase) >= 0) s += 100;
+  if (title.indexOf(phrase) >= 0) s += 80;
+  words.forEach(function (w) {
+    if (new RegExp('(^|[^a-z0-9_])' + escRe(w) + '($|[^a-z0-9_])').test(hay)) s += 10;
+    if (title.indexOf(w) >= 0) s += 3;
+  });
+  return s;
+}
 function fmtTime(ts) {
   var d = new Date(ts * 1000), p = function (n) { return String(n).padStart(2, '0'); };
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
@@ -170,7 +185,11 @@ function render() {
   var all = DEFAULT_CATS.concat(Object.keys(ci.counts).filter(function (c) { return DEFAULT_CATS.indexOf(c) < 0; }));
   $('#catlist').innerHTML = all.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
 
-  var shown = items.filter(match).sort(function (a, b) { return (b.updated - a.updated) || (a.id - b.id); });
+  var shown = items.filter(match), rank = {};
+  if (words.length) shown.forEach(function (it) { rank[it.id] = score(it); });
+  shown.sort(function (a, b) {
+    return ((rank[b.id] || 0) - (rank[a.id] || 0)) || (b.updated - a.updated) || (a.id - b.id);
+  });
   $('#summary').textContent = (cur === ALL ? '全部分类' : cur) + ' · ' + shown.length + ' 条' +
     (words.length ? '（搜索：' + words.join(' ') + '）' : '');
   if (!shown.length) {

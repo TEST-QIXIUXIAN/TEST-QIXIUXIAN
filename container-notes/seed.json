@@ -3994,5 +3994,11 @@
   "title": "查看服务和路由（oc get svc / route）",
   "code": "oc get svc\noc get route\noc get route <route名> -o jsonpath=\"{.spec.host}\"",
   "note": ""
+ },
+ {
+  "category": "OpenShift",
+  "title": "进入指定项目的 Pod（oc rsh -n）",
+  "code": "oc rsh -n <项目名> <pod名>\noc rsh -n <项目名> -c <容器名> <pod名>\noc rsh -n <项目名> deployment/<应用名>\noc rsh -n <项目名> --shell=/bin/bash <pod名>\noc rsh -n <项目名> <pod名> cat /etc/resolv.conf",
+  "note": "-n、-c、--shell 等参数必须写在 Pod 名前面（官方说明）；默认 shell 是 /bin/sh，有 bash 时可用 --shell=/bin/bash；Pod 名后面跟命令则只执行该命令"
  }
 ]

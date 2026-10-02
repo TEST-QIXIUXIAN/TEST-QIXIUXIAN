@@ -338,9 +338,11 @@ static int db_load(void)
     size_t k;
 
     if (!f) {
-        char *seed = xstrdup(SEED_DB);
-        db_parse(seed);
-        free(seed);
+        int i;
+        for (i = 0; SEED_DB_PARTS[i]; i++)
+            buf_puts(&b, SEED_DB_PARTS[i]);
+        db_parse(b.p);
+        free(b.p);
         return db_save();
     }
     while ((k = fread(chunk, 1, sizeof chunk, f)) > 0)
@@ -414,21 +416,28 @@ static void send_error(sock_t s, int code, const char *msg)
     free(b.p);
 }
 
-static void send_page(sock_t s, int head_only)
+/* Sends a NULL-terminated array of string chunks from page.h as one response. */
+static void send_parts(sock_t s, const char *const *parts, const char *ctype, const char *extra, int head_only)
 {
     size_t total = 0;
     int i;
-    for (i = 0; PAGE_PARTS[i]; i++)
-        total += strlen(PAGE_PARTS[i]);
-    send_head(s, 200, "text/html; charset=utf-8", total,
-              "Content-Security-Policy: default-src 'self'; script-src 'unsafe-inline'; "
-              "style-src 'unsafe-inline'; img-src 'self' data:\r\n"
-              "Referrer-Policy: no-referrer\r\n");
+    for (i = 0; parts[i]; i++)
+        total += strlen(parts[i]);
+    send_head(s, 200, ctype, total, extra);
     if (head_only)
         return;
-    for (i = 0; PAGE_PARTS[i]; i++)
-        if (send_all(s, PAGE_PARTS[i], strlen(PAGE_PARTS[i])) != 0)
+    for (i = 0; parts[i]; i++)
+        if (send_all(s, parts[i], strlen(parts[i])) != 0)
             return;
+}
+
+static void send_page(sock_t s, int head_only)
+{
+    send_parts(s, PAGE_PARTS, "text/html; charset=utf-8",
+               "Content-Security-Policy: default-src 'self'; script-src 'unsafe-inline'; "
+               "style-src 'unsafe-inline'; img-src 'self' data:\r\n"
+               "Referrer-Policy: no-referrer\r\n",
+               head_only);
 }
 
 static int ieq_n(const char *a, const char *b, size_t n)
@@ -683,6 +692,8 @@ static void handle(sock_t c)
             send_page(c, method[0] == 'H');
         else if (!strcmp(target, "/api/list"))
             api_list(c);
+        else if (!strcmp(target, "/api/seed")) /* the built-in commands, for merging into old data */
+            send_parts(c, SEED_JSON_PARTS, "application/json; charset=utf-8", NULL, 0);
         else
             send_error(c, 404, "not found");
     } else if (!strcmp(method, "POST")) {

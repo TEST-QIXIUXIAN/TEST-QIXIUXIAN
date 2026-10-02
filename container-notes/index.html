@@ -64,6 +64,7 @@ textarea.code{min-height:200px;font-family:"Cascadia Mono",Consolas,"Courier New
 <button class="btn" id="exportMd" title="按分类导出为 Markdown 文档">导出 MD</button>
 <button class="btn" id="exportJson" title="导出为 JSON，可用于备份和导入">导出 JSON</button>
 <button class="btn" id="importBtn" title="导入本程序导出的 JSON（自动跳过重复）">导入</button>
+<button class="btn" id="seedBtn" title="把程序内置的常用命令补充到你的记录中（自动跳过已有的）">补充内置命令</button>
 <input type="file" id="importFile" accept=".json,application/json" hidden>
 </header>
 
@@ -95,7 +96,8 @@ textarea.code{min-height:200px;font-family:"Cascadia Mono",Consolas,"Courier New
 (function () {
 'use strict';
 var ALL = '全部';
-var DEFAULT_CATS = ['Docker', 'Dockerfile', 'Docker Compose', 'Kubernetes', 'Helm', 'Podman', '镜像仓库', '网络与存储', '排障调试', '其他'];
+var DEFAULT_CATS = ['Docker', 'Docker 镜像', 'Dockerfile', 'Docker Compose', 'Kubernetes', 'K8s YAML 模板', 'Helm',
+  'Podman', 'containerd / crictl', '镜像仓库', '网络与存储', '排障调试', 'Windows 与 WSL', '其他'];
 var items = [], cur = ALL, words = [];
 var $ = function (s) { return document.querySelector(s); };
 var dlg = $('#dlg'), form = $('#form');
@@ -280,6 +282,23 @@ $('#exportMd').addEventListener('click', function () {
   download('container-notes-' + stamp() + '.md', md, 'text/markdown');
 });
 $('#importBtn').addEventListener('click', function () { $('#importFile').click(); });
+// adds records that are not already present (same title + code); returns a promise of the counts
+function importList(list) {
+  var seen = {}, added = 0, skipped = 0, chain = Promise.resolve();
+  items.forEach(function (i) { seen[i.title + '\u0000' + i.code] = 1; });
+  list.forEach(function (r) {
+    if (!r || typeof r !== 'object') return;
+    var d = { category: String(r.category || '其他'), title: String(r.title || ''), code: String(r.code || ''), note: String(r.note || '') };
+    var k = d.title + '\u0000' + d.code;
+    if (!d.title && !d.code) return;
+    if (seen[k]) { skipped++; return; }
+    seen[k] = 1;
+    chain = chain.then(function () { return api('/api/save', d); }).then(function () { added++; });
+  });
+  return chain.catch(function (err) { alert('导入中断：' + err.message); })
+    .then(function () { return load(); })
+    .then(function () { return { added: added, skipped: skipped }; });
+}
 $('#importFile').addEventListener('change', function (e) {
   var f = e.target.files[0];
   e.target.value = '';
@@ -288,21 +307,18 @@ $('#importFile').addEventListener('change', function (e) {
     var list;
     try { list = JSON.parse(txt); } catch (_) { list = null; }
     if (!Array.isArray(list)) { alert('文件格式不正确：请选择本程序「导出 JSON」得到的文件'); return; }
-    var seen = {}, added = 0, skipped = 0;
-    items.forEach(function (i) { seen[i.title + '\u0000' + i.code] = 1; });
-    var chain = Promise.resolve();
-    list.forEach(function (r) {
-      if (!r || typeof r !== 'object') return;
-      var d = { category: String(r.category || '其他'), title: String(r.title || ''), code: String(r.code || ''), note: String(r.note || '') };
-      var k = d.title + '\u0000' + d.code;
-      if (!d.title && !d.code) return;
-      if (seen[k]) { skipped++; return; }
-      seen[k] = 1;
-      chain = chain.then(function () { return api('/api/save', d); }).then(function () { added++; });
-    });
-    chain.catch(function (err) { alert('导入中断：' + err.message); })
-      .then(function () { toast('导入 ' + added + ' 条，跳过重复 ' + skipped + ' 条'); load(); });
+    return importList(list).then(function (n) { toast('导入 ' + n.added + ' 条，跳过重复 ' + n.skipped + ' 条'); });
   });
+});
+$('#seedBtn').addEventListener('click', function () {
+  var b = this;
+  b.disabled = true;
+  api('/api/seed').then(function (list) {
+    return importList(list).then(function (n) {
+      toast(n.added ? '新增内置命令 ' + n.added + ' 条（已有的 ' + n.skipped + ' 条已跳过）' : '内置命令都已经在你的记录里了');
+    });
+  }).catch(function (err) { alert('读取内置命令失败：' + err.message); })
+    .then(function () { b.disabled = false; });
 });
 
 load();

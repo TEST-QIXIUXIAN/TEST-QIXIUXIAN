@@ -1,25 +1,1814 @@
 [
-  {"category": "Docker", "title": "查看容器列表", "code": "docker ps\ndocker ps -a", "note": "-a 同时显示已停止的容器"},
-  {"category": "Docker", "title": "进入容器终端", "code": "docker exec -it <容器名> /bin/sh", "note": "镜像里有 bash 时可换成 /bin/bash"},
-  {"category": "Docker", "title": "查看容器日志", "code": "docker logs -f --tail 200 <容器名>", "note": "-f 持续跟随输出；--since 10m 只看最近 10 分钟"},
-  {"category": "Docker", "title": "后台运行容器（端口映射 + 目录挂载）", "code": "docker run -d --name web -p 8080:80 -v ${PWD}/data:/data --restart unless-stopped nginx:latest", "note": "PowerShell 用 ${PWD}，CMD 用 %cd% 表示当前目录"},
-  {"category": "Docker", "title": "构建镜像", "code": "docker build -t myapp:1.0 .", "note": "指定 Dockerfile：-f path/to/Dockerfile；不使用缓存：--no-cache"},
-  {"category": "Docker", "title": "容器与主机之间拷贝文件", "code": "docker cp <容器名>:/app/app.log ./app.log\ndocker cp ./config.yaml <容器名>:/app/config.yaml", "note": ""},
-  {"category": "Docker", "title": "查看资源占用", "code": "docker stats --no-stream", "note": "去掉 --no-stream 可实时刷新"},
-  {"category": "Docker", "title": "清理无用资源", "code": "docker system df\ndocker system prune -f\ndocker image prune -a -f", "note": "image prune -a 会删除所有未被容器使用的镜像，执行前请确认"},
-  {"category": "Dockerfile", "title": "多阶段构建模板", "code": "FROM golang:1.22 AS build\nWORKDIR /src\nCOPY . .\nRUN CGO_ENABLED=0 go build -o /out/app .\n\nFROM alpine:3.20\nCOPY --from=build /out/app /usr/local/bin/app\nEXPOSE 8080\nENTRYPOINT [\"app\"]", "note": "构建阶段与运行阶段分离，最终镜像只包含可执行文件"},
-  {"category": "Docker Compose", "title": "启动 / 重建服务", "code": "docker compose up -d --build", "note": "只重建某个服务：docker compose up -d --build <服务名>"},
-  {"category": "Docker Compose", "title": "停止并删除服务", "code": "docker compose down", "note": "加 -v 会同时删除数据卷，谨慎使用"},
-  {"category": "Docker Compose", "title": "查看服务日志", "code": "docker compose logs -f --tail 200 <服务名>", "note": ""},
-  {"category": "Kubernetes", "title": "查看 Pod", "code": "kubectl get pods -n <命名空间> -o wide", "note": "所有命名空间：-A；持续观察：-w"},
-  {"category": "Kubernetes", "title": "查看 Pod 详情与事件", "code": "kubectl describe pod <pod名> -n <命名空间>", "note": "重点看最后的 Events：拉镜像失败、调度失败、探针失败等"},
-  {"category": "Kubernetes", "title": "查看 Pod 日志", "code": "kubectl logs -f <pod名> -n <命名空间> --tail=200", "note": "多容器 Pod 加 -c <容器名>；查看崩溃前的日志加 --previous"},
-  {"category": "Kubernetes", "title": "进入 Pod", "code": "kubectl exec -it <pod名> -n <命名空间> -- /bin/sh", "note": ""},
-  {"category": "Kubernetes", "title": "端口转发到本机", "code": "kubectl port-forward svc/<服务名> 8080:80 -n <命名空间>", "note": "之后浏览器访问 http://127.0.0.1:8080"},
-  {"category": "Kubernetes", "title": "发布与滚动重启", "code": "kubectl apply -f deploy.yaml\nkubectl rollout restart deployment/<名称> -n <命名空间>\nkubectl rollout status deployment/<名称> -n <命名空间>", "note": "回滚：kubectl rollout undo deployment/<名称> -n <命名空间>"},
-  {"category": "Kubernetes", "title": "切换集群上下文", "code": "kubectl config get-contexts\nkubectl config use-context <上下文名>", "note": ""},
-  {"category": "Helm", "title": "安装或升级 Release", "code": "helm upgrade --install <release> <chart> -n <命名空间> --create-namespace -f values.yaml", "note": "先预览渲染结果：helm template <release> <chart> -f values.yaml"},
-  {"category": "镜像仓库", "title": "登录、打标签并推送镜像", "code": "docker login <仓库地址>\ndocker tag myapp:1.0 <仓库地址>/<项目>/myapp:1.0\ndocker push <仓库地址>/<项目>/myapp:1.0", "note": ""},
-  {"category": "网络与存储", "title": "查看容器 IP", "code": "docker inspect -f \"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}\" <容器名>", "note": ""},
-  {"category": "排障调试", "title": "给 Pod 挂临时调试容器", "code": "kubectl debug -it <pod名> -n <命名空间> --image=busybox:1.36 --target=<容器名>", "note": "适用于镜像里没有 shell 或排查工具的情况"}
+ {
+  "category": "Docker",
+  "title": "查看容器列表",
+  "code": "docker ps\ndocker ps -a",
+  "note": "-a 同时显示已停止的容器"
+ },
+ {
+  "category": "Docker",
+  "title": "进入容器终端",
+  "code": "docker exec -it <容器名> /bin/sh",
+  "note": "镜像里有 bash 时可换成 /bin/bash"
+ },
+ {
+  "category": "Docker",
+  "title": "查看容器日志",
+  "code": "docker logs -f --tail 200 <容器名>",
+  "note": "-f 持续跟随输出；--since 10m 只看最近 10 分钟"
+ },
+ {
+  "category": "Docker",
+  "title": "后台运行容器（端口映射 + 目录挂载）",
+  "code": "docker run -d --name web -p 8080:80 -v ${PWD}/data:/data --restart unless-stopped nginx:latest",
+  "note": "PowerShell 用 ${PWD}，CMD 用 %cd% 表示当前目录"
+ },
+ {
+  "category": "Docker",
+  "title": "容器与主机之间拷贝文件",
+  "code": "docker cp <容器名>:/app/app.log ./app.log\ndocker cp ./config.yaml <容器名>:/app/config.yaml",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "查看资源占用",
+  "code": "docker stats --no-stream",
+  "note": "去掉 --no-stream 可实时刷新"
+ },
+ {
+  "category": "Docker",
+  "title": "清理无用资源",
+  "code": "docker system df\ndocker system prune -f\ndocker image prune -a -f",
+  "note": "image prune -a 会删除所有未被容器使用的镜像，执行前请确认"
+ },
+ {
+  "category": "Docker",
+  "title": "运行临时交互容器（退出即删除）",
+  "code": "docker run -it --rm ubuntu:24.04 bash",
+  "note": "--rm 表示容器退出后自动删除"
+ },
+ {
+  "category": "Docker",
+  "title": "启动 / 停止 / 重启容器",
+  "code": "docker start <容器名>\ndocker stop <容器名>\ndocker restart <容器名>",
+  "note": "stop 默认等 10 秒后强制结束，可用 -t 30 调整等待秒数"
+ },
+ {
+  "category": "Docker",
+  "title": "强制删除容器",
+  "code": "docker rm -f <容器名>",
+  "note": "运行中的容器也会被直接删除"
+ },
+ {
+  "category": "Docker",
+  "title": "删除所有已停止的容器",
+  "code": "docker container prune -f",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "停止并删除全部容器",
+  "code": "docker stop $(docker ps -q)\ndocker rm -f $(docker ps -aq)",
+  "note": "PowerShell 和 Linux shell 都可以这样写；谨慎使用"
+ },
+ {
+  "category": "Docker",
+  "title": "自定义列表输出格式",
+  "code": "docker ps --format \"table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}\"",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "按条件筛选容器",
+  "code": "docker ps -a --filter \"status=exited\"\ndocker ps --filter \"name=web\"\ndocker ps --filter \"ancestor=nginx\"",
+  "note": "常用过滤条件：status、name、ancestor（镜像）、label、network"
+ },
+ {
+  "category": "Docker",
+  "title": "查看容器完整配置",
+  "code": "docker inspect <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "查看退出码 / 重启次数 / 是否 OOM",
+  "code": "docker inspect -f \"{{.State.ExitCode}} {{.RestartCount}} {{.State.OOMKilled}}\" <容器名>",
+  "note": "OOMKilled 为 true 表示内存超出限制被杀；退出码 137 通常也是被 kill"
+ },
+ {
+  "category": "Docker",
+  "title": "查看容器内进程",
+  "code": "docker top <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "查看端口映射",
+  "code": "docker port <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "查看容器文件系统变化",
+  "code": "docker diff <容器名>",
+  "note": "A 新增，C 修改，D 删除"
+ },
+ {
+  "category": "Docker",
+  "title": "带环境变量运行",
+  "code": "docker run -d --name app -e TZ=Asia/Shanghai -e APP_ENV=prod --env-file .env myapp:1.0",
+  "note": "--env-file 每行一个 KEY=VALUE"
+ },
+ {
+  "category": "Docker",
+  "title": "限制 CPU 和内存",
+  "code": "docker run -d --name app --cpus 1.5 --memory 512m myapp:1.0",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "在线修改资源限制",
+  "code": "docker update --cpus 2 --memory 1g --memory-swap 1g <容器名>",
+  "note": "调大内存时 --memory-swap 需不小于 --memory"
+ },
+ {
+  "category": "Docker",
+  "title": "修改重启策略",
+  "code": "docker update --restart unless-stopped <容器名>",
+  "note": "可选：no、on-failure[:次数]、always、unless-stopped"
+ },
+ {
+  "category": "Docker",
+  "title": "以 root 身份进入容器",
+  "code": "docker exec -it -u root <容器名> sh",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "在容器中执行单条命令",
+  "code": "docker exec <容器名> cat /etc/os-release",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "查看指定时间段的日志",
+  "code": "docker logs --since 2025-01-01T10:00:00 --until 2025-01-01T11:00:00 <容器名>",
+  "note": "也可以用相对时间：--since 30m、--since 2h"
+ },
+ {
+  "category": "Docker",
+  "title": "日志带时间戳",
+  "code": "docker logs -t --tail 100 <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "日志中搜索关键字",
+  "code": "docker logs <容器名> 2>&1 | grep -i error",
+  "note": "PowerShell：docker logs <容器名> 2>&1 | Select-String -Pattern error"
+ },
+ {
+  "category": "Docker",
+  "title": "重命名容器",
+  "code": "docker rename <旧名> <新名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "暂停 / 恢复容器",
+  "code": "docker pause <容器名>\ndocker unpause <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "等待容器结束并取退出码",
+  "code": "docker wait <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "把容器保存为镜像（临时排查用）",
+  "code": "docker commit <容器名> myapp:debug",
+  "note": "正式镜像应使用 Dockerfile 构建，便于复现"
+ },
+ {
+  "category": "Docker",
+  "title": "导出 / 导入容器文件系统",
+  "code": "docker export <容器名> -o rootfs.tar\ndocker import rootfs.tar myrootfs:1.0",
+  "note": "export 不包含镜像历史和元数据；镜像迁移请用 docker save / load"
+ },
+ {
+  "category": "Docker",
+  "title": "覆盖入口点运行",
+  "code": "docker run -it --rm --entrypoint sh myapp:1.0",
+  "note": "镜像启动即退出、需要进去看看时很有用"
+ },
+ {
+  "category": "Docker",
+  "title": "使用宿主机网络",
+  "code": "docker run -d --network host nginx",
+  "note": "在 Linux 上完全生效；Docker Desktop 下行为不同"
+ },
+ {
+  "category": "Docker",
+  "title": "只读运行（加固）",
+  "code": "docker run -d --read-only --tmpfs /tmp -v ${PWD}/conf:/etc/app:ro myapp:1.0",
+  "note": ":ro 只读挂载；--tmpfs 提供可写的临时目录"
+ },
+ {
+  "category": "Docker",
+  "title": "添加 hosts 解析",
+  "code": "docker run -d --add-host db.local:192.168.1.10 myapp:1.0\ndocker run -d --add-host host.docker.internal:host-gateway myapp:1.0",
+  "note": "第二种写法让 Linux 上的容器也能用 host.docker.internal 访问宿主机"
+ },
+ {
+  "category": "Docker",
+  "title": "添加 Linux 能力（替代 --privileged）",
+  "code": "docker run -d --cap-add NET_ADMIN myapp:1.0",
+  "note": "尽量只加需要的能力，避免使用 --privileged"
+ },
+ {
+  "category": "Docker",
+  "title": "带健康检查运行",
+  "code": "docker run -d --name web --health-cmd \"curl -f http://localhost/ || exit 1\" --health-interval 30s --health-retries 3 nginx",
+  "note": "镜像里需要有 curl"
+ },
+ {
+  "category": "Docker",
+  "title": "查看健康检查结果",
+  "code": "docker inspect -f \"{{json .State.Health}}\" <容器名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "使用 GPU",
+  "code": "docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi",
+  "note": "需要先安装 NVIDIA 驱动和 NVIDIA Container Toolkit"
+ },
+ {
+  "category": "Docker",
+  "title": "实时查看 Docker 事件",
+  "code": "docker events --filter container=<容器名>",
+  "note": "能看到 start、die、oom、health_status 等事件"
+ },
+ {
+  "category": "Docker",
+  "title": "附加到容器主进程",
+  "code": "docker attach <容器名>",
+  "note": "按 Ctrl+P 再按 Ctrl+Q 退出；按 Ctrl+C 会停止容器"
+ },
+ {
+  "category": "Docker",
+  "title": "查看版本与引擎信息",
+  "code": "docker version\ndocker info",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "查看磁盘占用明细",
+  "code": "docker system df -v",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "彻底清理（含数据卷）",
+  "code": "docker system prune -a --volumes -f",
+  "note": "会删除所有未使用的镜像、网络、构建缓存和数据卷，务必确认"
+ },
+ {
+  "category": "Docker",
+  "title": "切换 Docker 上下文",
+  "code": "docker context ls\ndocker context use <上下文名>",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "通过 SSH 操作远程 Docker",
+  "code": "docker context create remote --docker \"host=ssh://user@<主机>\"\ndocker --context remote ps",
+  "note": "需要能免密 SSH 登录远程主机"
+ },
+ {
+  "category": "Docker",
+  "title": "配置镜像加速器",
+  "code": "{\n  \"registry-mirrors\": [\"https://<加速器地址>\"]\n}",
+  "note": "Docker Desktop：Settings → Docker Engine 中编辑；Linux：/etc/docker/daemon.json，修改后 systemctl restart docker"
+ },
+ {
+  "category": "Docker",
+  "title": "配置容器日志轮转（daemon.json）",
+  "code": "{\n  \"log-driver\": \"json-file\",\n  \"log-opts\": { \"max-size\": \"100m\", \"max-file\": \"3\" }\n}",
+  "note": "只对之后新建的容器生效"
+ },
+ {
+  "category": "Docker",
+  "title": "Linux 上重启并查看 Docker 服务日志",
+  "code": "sudo systemctl restart docker\nsudo journalctl -u docker -f",
+  "note": ""
+ },
+ {
+  "category": "Docker",
+  "title": "Linux 普通用户免 sudo 使用 docker",
+  "code": "sudo usermod -aG docker $USER\nnewgrp docker",
+  "note": "加入 docker 组等同于给予 root 权限"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "构建镜像",
+  "code": "docker build -t myapp:1.0 .",
+  "note": "指定 Dockerfile：-f path/to/Dockerfile；不使用缓存：--no-cache"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "列出镜像",
+  "code": "docker images\ndocker image ls --format \"table {{.Repository}}:{{.Tag}}\\t{{.Size}}\"",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "拉取指定平台的镜像",
+  "code": "docker pull --platform linux/amd64 nginx:1.27",
+  "note": "Apple 芯片或 ARM 服务器上拉 x86 镜像时使用"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "删除镜像",
+  "code": "docker rmi <镜像名:标签>",
+  "note": "镜像被容器使用时需先删容器，或加 -f"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "删除悬空镜像（<none>）",
+  "code": "docker image prune -f",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看镜像构建历史与每层大小",
+  "code": "docker history --no-trunc myapp:1.0",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看镜像详情",
+  "code": "docker image inspect myapp:1.0",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看镜像系统与架构",
+  "code": "docker image inspect -f \"{{.Os}}/{{.Architecture}}\" myapp:1.0",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "保存 / 加载镜像（离线传输）",
+  "code": "docker save -o images.tar myapp:1.0 nginx:1.27\ndocker load -i images.tar",
+  "note": "可一次 save 多个镜像；压缩：docker save myapp:1.0 | gzip > myapp.tar.gz"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "给镜像打标签",
+  "code": "docker tag myapp:1.0 myapp:latest",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看镜像摘要（digest）",
+  "code": "docker images --digests",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "构建时传入参数",
+  "code": "docker build --build-arg VERSION=1.2.3 -t myapp:1.2.3 .",
+  "note": "Dockerfile 中需要声明 ARG VERSION"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "只构建到指定阶段",
+  "code": "docker build --target build -t myapp:build .",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "不用缓存并拉取最新基础镜像",
+  "code": "docker build --no-cache --pull -t myapp:1.0 .",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "构建时显示完整输出",
+  "code": "docker build --progress=plain -t myapp:1.0 .",
+  "note": "排查 RUN 步骤报错时很有用"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "在 Docker Hub 搜索镜像",
+  "code": "docker search nginx",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看镜像里的文件",
+  "code": "docker run --rm --entrypoint ls myapp:1.0 -la /app",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看远程镜像清单（多架构）",
+  "code": "docker buildx imagetools inspect nginx:1.27",
+  "note": "不用拉取镜像即可查看支持哪些平台"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "多平台构建并推送",
+  "code": "docker buildx create --name multi --use\ndocker buildx build --platform linux/amd64,linux/arm64 -t <仓库地址>/myapp:1.0 --push .",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "buildx 构建并加载到本地",
+  "code": "docker buildx build --load -t myapp:1.0 .",
+  "note": "--load 只支持单一平台"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "查看 / 切换 builder",
+  "code": "docker buildx ls\ndocker buildx use <builder名>",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "清理构建缓存",
+  "code": "docker builder prune -f\ndocker buildx prune -a -f",
+  "note": ""
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "使用仓库作为构建缓存",
+  "code": "docker buildx build \\\n  --cache-from type=registry,ref=<仓库地址>/myapp:cache \\\n  --cache-to type=registry,ref=<仓库地址>/myapp:cache,mode=max \\\n  -t <仓库地址>/myapp:1.0 --push .",
+  "note": "CI 中复用缓存，加快构建；PowerShell 续行符用反引号 `"
+ },
+ {
+  "category": "Docker 镜像",
+  "title": "扫描镜像漏洞",
+  "code": "docker scout cves myapp:1.0\ntrivy image myapp:1.0",
+  "note": "docker scout 随 Docker Desktop 提供；trivy 需单独安装"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "多阶段构建模板",
+  "code": "FROM golang:1.22 AS build\nWORKDIR /src\nCOPY . .\nRUN CGO_ENABLED=0 go build -o /out/app .\n\nFROM alpine:3.20\nCOPY --from=build /out/app /usr/local/bin/app\nEXPOSE 8080\nENTRYPOINT [\"app\"]",
+  "note": "构建阶段与运行阶段分离，最终镜像只包含可执行文件"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "Node.js 应用模板",
+  "code": "FROM node:20-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --omit=dev\nCOPY . .\nUSER node\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]",
+  "note": "先复制 package*.json 再安装依赖，可以利用构建缓存"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "Python 应用模板",
+  "code": "FROM python:3.12-slim\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nCMD [\"python\", \"main.py\"]",
+  "note": ""
+ },
+ {
+  "category": "Dockerfile",
+  "title": "Java（Spring Boot）多阶段模板",
+  "code": "FROM maven:3.9-eclipse-temurin-21 AS build\nWORKDIR /src\nCOPY pom.xml .\nRUN mvn -q dependency:go-offline\nCOPY src ./src\nRUN mvn -q package -DskipTests\n\nFROM eclipse-temurin:21-jre\nWORKDIR /app\nCOPY --from=build /src/target/*.jar app.jar\nEXPOSE 8080\nENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]",
+  "note": ""
+ },
+ {
+  "category": "Dockerfile",
+  "title": "前端打包 + Nginx 托管模板",
+  "code": "FROM node:20-alpine AS build\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\nFROM nginx:1.27-alpine\nCOPY --from=build /app/dist /usr/share/nginx/html\nEXPOSE 80",
+  "note": "打包输出目录按项目调整（dist / build）"
+ },
+ {
+  "category": "Dockerfile",
+  "title": ".dockerignore 模板",
+  "code": ".git\nnode_modules\n**/*.log\n.env\nDockerfile\ndocker-compose*.yml",
+  "note": "减少构建上下文体积，避免把密钥和依赖目录打进镜像"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "创建并使用非 root 用户",
+  "code": "# Alpine\nRUN addgroup -S app && adduser -S app -G app\nUSER app\n\n# Debian / Ubuntu\nRUN useradd -r -u 10001 -g root app\nUSER 10001",
+  "note": ""
+ },
+ {
+  "category": "Dockerfile",
+  "title": "健康检查 HEALTHCHECK",
+  "code": "HEALTHCHECK --interval=30s --timeout=3s --retries=3 \\\n  CMD wget -qO- http://localhost:8080/health || exit 1",
+  "note": ""
+ },
+ {
+  "category": "Dockerfile",
+  "title": "设置时区为上海",
+  "code": "ENV TZ=Asia/Shanghai\nRUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone",
+  "note": "镜像中没有 /usr/share/zoneinfo 时需先安装 tzdata"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "apt 安装软件并清理缓存",
+  "code": "RUN apt-get update \\\n    && apt-get install -y --no-install-recommends curl ca-certificates \\\n    && rm -rf /var/lib/apt/lists/*",
+  "note": "合并成一个 RUN，减少镜像层和体积"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "apk 安装软件（Alpine）",
+  "code": "RUN apk add --no-cache curl tzdata",
+  "note": ""
+ },
+ {
+  "category": "Dockerfile",
+  "title": "国内软件源（Debian / Alpine）",
+  "code": "# Debian 12（bookworm）\nRUN sed -i \"s/deb.debian.org/mirrors.aliyun.com/g\" /etc/apt/sources.list.d/debian.sources\n\n# Alpine\nRUN sed -i \"s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g\" /etc/apk/repositories",
+  "note": "旧版 Debian 的源文件是 /etc/apt/sources.list"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "BuildKit 缓存挂载（加速依赖安装）",
+  "code": "# syntax=docker/dockerfile:1\nRUN --mount=type=cache,target=/root/.cache/pip \\\n    pip install -r requirements.txt",
+  "note": "缓存不会进入镜像层，重复构建明显变快"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "构建时使用密钥（不留在镜像里）",
+  "code": "# Dockerfile\nRUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm ci\n\n# 构建命令\ndocker build --secret id=npmrc,src=$HOME/.npmrc -t myapp:1.0 .",
+  "note": ""
+ },
+ {
+  "category": "Dockerfile",
+  "title": "ARG / ENV / LABEL 用法",
+  "code": "ARG VERSION=dev\nENV APP_VERSION=$VERSION\nLABEL org.opencontainers.image.version=$VERSION",
+  "note": "ARG 只在构建期可用；ENV 运行时也存在"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "ENTRYPOINT 与 CMD 配合",
+  "code": "ENTRYPOINT [\"python\", \"app.py\"]\nCMD [\"--port\", \"8080\"]",
+  "note": "docker run 镜像名 后面的参数会替换 CMD，ENTRYPOINT 保持不变"
+ },
+ {
+  "category": "Dockerfile",
+  "title": "COPY 时修改文件属主",
+  "code": "COPY --chown=app:app . /app",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "启动 / 重建服务",
+  "code": "docker compose up -d --build",
+  "note": "只重建某个服务：docker compose up -d --build <服务名>"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "停止并删除服务",
+  "code": "docker compose down",
+  "note": "加 -v 会同时删除数据卷，谨慎使用"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "查看服务日志",
+  "code": "docker compose logs -f --tail 200 <服务名>",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "查看服务状态",
+  "code": "docker compose ps",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "进入服务容器",
+  "code": "docker compose exec <服务名> sh",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "运行一次性命令",
+  "code": "docker compose run --rm <服务名> <命令>",
+  "note": "例如数据库迁移：docker compose run --rm web python manage.py migrate"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "重启单个服务",
+  "code": "docker compose restart <服务名>",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "拉取最新镜像并更新",
+  "code": "docker compose pull\ndocker compose up -d",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "强制重建单个服务",
+  "code": "docker compose up -d --force-recreate --no-deps <服务名>",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "校验并查看合并后的配置",
+  "code": "docker compose config",
+  "note": "会展开变量，配置有误时直接报错"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "指定多个配置文件与项目名",
+  "code": "docker compose -f docker-compose.yml -f docker-compose.prod.yml -p myproj up -d",
+  "note": "后面的文件覆盖前面的同名配置"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "服务扩容",
+  "code": "docker compose up -d --scale worker=3",
+  "note": "被扩容的服务不能写死 container_name 和宿主机端口"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "只停止不删除",
+  "code": "docker compose stop\ndocker compose start",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "查看服务中的进程",
+  "code": "docker compose top",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "按 profile 启动可选服务",
+  "code": "docker compose --profile debug up -d",
+  "note": "服务中配置 profiles: [\"debug\"] 后，默认不启动"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "开发时文件变更自动同步",
+  "code": "docker compose watch",
+  "note": "需在服务中配置 develop.watch"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "Compose 模板（Web + 数据库）",
+  "code": "services:\n  web:\n    image: nginx:1.27\n    ports:\n      - \"8080:80\"\n    volumes:\n      - ./html:/usr/share/nginx/html:ro\n    depends_on:\n      db:\n        condition: service_healthy\n    restart: unless-stopped\n  db:\n    image: postgres:16\n    environment:\n      POSTGRES_PASSWORD: example\n    volumes:\n      - dbdata:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]\n      interval: 10s\n      retries: 5\n\nvolumes:\n  dbdata:",
+  "note": "condition: service_healthy 让 web 等数据库就绪后再启动"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "使用 .env 变量和默认值",
+  "code": "services:\n  app:\n    image: myapp:${TAG:-latest}\n    env_file:\n      - .env",
+  "note": "与 compose 文件同目录的 .env 会被自动读取"
+ },
+ {
+  "category": "Docker Compose",
+  "title": "服务资源限制",
+  "code": "services:\n  app:\n    deploy:\n      resources:\n        limits:\n          cpus: \"1.0\"\n          memory: 512M",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "服务日志轮转",
+  "code": "services:\n  app:\n    logging:\n      driver: json-file\n      options:\n        max-size: \"50m\"\n        max-file: \"3\"",
+  "note": ""
+ },
+ {
+  "category": "Docker Compose",
+  "title": "使用已存在的外部网络",
+  "code": "networks:\n  default:\n    name: mynet\n    external: true",
+  "note": "先执行 docker network create mynet"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看 Pod",
+  "code": "kubectl get pods -n <命名空间> -o wide",
+  "note": "所有命名空间：-A；持续观察：-w"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看 Pod 详情与事件",
+  "code": "kubectl describe pod <pod名> -n <命名空间>",
+  "note": "重点看最后的 Events：拉镜像失败、调度失败、探针失败等"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看 Pod 日志",
+  "code": "kubectl logs -f <pod名> -n <命名空间> --tail=200",
+  "note": "多容器 Pod 加 -c <容器名>；查看崩溃前的日志加 --previous"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "进入 Pod",
+  "code": "kubectl exec -it <pod名> -n <命名空间> -- /bin/sh",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "端口转发到本机",
+  "code": "kubectl port-forward svc/<服务名> 8080:80 -n <命名空间>",
+  "note": "之后浏览器访问 http://127.0.0.1:8080"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "发布与滚动重启",
+  "code": "kubectl apply -f deploy.yaml\nkubectl rollout restart deployment/<名称> -n <命名空间>\nkubectl rollout status deployment/<名称> -n <命名空间>",
+  "note": "回滚：kubectl rollout undo deployment/<名称> -n <命名空间>"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "切换集群上下文",
+  "code": "kubectl config get-contexts\nkubectl config use-context <上下文名>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看命名空间下的常用资源",
+  "code": "kubectl get all -n <命名空间>",
+  "note": "all 不包含 ConfigMap、Secret、Ingress、PVC 等"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看节点",
+  "code": "kubectl get nodes -o wide",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看命名空间",
+  "code": "kubectl get ns",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "设置默认命名空间",
+  "code": "kubectl config set-context --current --namespace=<命名空间>",
+  "note": "之后的命令可以省略 -n"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看当前上下文",
+  "code": "kubectl config current-context",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "使用指定的 kubeconfig",
+  "code": "kubectl --kubeconfig ./cluster.yaml get nodes",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "按标签筛选",
+  "code": "kubectl get pods -l app=<应用名> -n <命名空间>\nkubectl get pods --show-labels -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看所有非 Running 的 Pod",
+  "code": "kubectl get pods -A --field-selector=status.phase!=Running",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看某节点上的 Pod",
+  "code": "kubectl get pods -A -o wide --field-selector spec.nodeName=<节点名>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "以 YAML 输出资源",
+  "code": "kubectl get deployment <名称> -n <命名空间> -o yaml",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "自定义列输出",
+  "code": "kubectl get pods -n <命名空间> -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName,STATUS:.status.phase",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "列出每个 Pod 使用的镜像",
+  "code": "kubectl get pods -n <命名空间> -o jsonpath=\"{range .items[*]}{.metadata.name}{'\\t'}{.spec.containers[*].image}{'\\n'}{end}\"",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "按重启次数排序 Pod",
+  "code": "kubectl get pods -A --sort-by=\".status.containerStatuses[0].restartCount\"",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看资源使用（CPU / 内存）",
+  "code": "kubectl top nodes\nkubectl top pods -n <命名空间> --containers",
+  "note": "需要集群已安装 metrics-server"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看集群信息与版本",
+  "code": "kubectl cluster-info\nkubectl version",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看所有资源类型",
+  "code": "kubectl api-resources",
+  "note": "可以看到简称，例如 deploy、svc、cm、ing"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看字段说明",
+  "code": "kubectl explain deployment.spec.strategy --recursive",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "持续观察资源变化",
+  "code": "kubectl get pods -n <命名空间> -w",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "命令行创建 Deployment",
+  "code": "kubectl create deployment web --image=nginx:1.27 --replicas=2 -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "为 Deployment 创建 Service",
+  "code": "kubectl expose deployment web --port=80 --target-port=80 --type=ClusterIP -n <命名空间>",
+  "note": "对外暴露可用 --type=NodePort 或 LoadBalancer"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "生成 YAML 而不创建",
+  "code": "kubectl create deployment web --image=nginx:1.27 --dry-run=client -o yaml > deploy.yaml",
+  "note": "快速得到一份可改的模板"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "扩缩容",
+  "code": "kubectl scale deployment/<名称> --replicas=3 -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "更新镜像版本",
+  "code": "kubectl set image deployment/<名称> <容器名>=<镜像>:<标签> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看发布历史",
+  "code": "kubectl rollout history deployment/<名称> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "回滚到指定版本",
+  "code": "kubectl rollout undo deployment/<名称> --to-revision=2 -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "暂停 / 恢复发布",
+  "code": "kubectl rollout pause deployment/<名称> -n <命名空间>\nkubectl rollout resume deployment/<名称> -n <命名空间>",
+  "note": "暂停期间可连续修改多处，恢复后一次性发布"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "重启命名空间下全部 Deployment",
+  "code": "kubectl rollout restart deployment -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "应用前预览差异",
+  "code": "kubectl diff -f deploy.yaml",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "服务端校验（不实际创建）",
+  "code": "kubectl apply -f deploy.yaml --dry-run=server",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "应用整个目录 / Kustomize",
+  "code": "kubectl apply -f ./manifests/ -R\nkubectl apply -k ./overlays/prod",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "删除资源",
+  "code": "kubectl delete -f deploy.yaml\nkubectl delete pod <pod名> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "强制删除卡住的 Pod",
+  "code": "kubectl delete pod <pod名> -n <命名空间> --grace-period=0 --force",
+  "note": "只在 Pod 长时间 Terminating 时使用"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "修改环境变量",
+  "code": "kubectl set env deployment/<名称> KEY=value -n <命名空间>\nkubectl set env deployment/<名称> --list -n <命名空间>",
+  "note": "修改会触发滚动更新"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "修改资源 requests / limits",
+  "code": "kubectl set resources deployment/<名称> -c <容器名> --requests=cpu=100m,memory=128Mi --limits=cpu=500m,memory=512Mi -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "创建自动扩缩容（HPA）",
+  "code": "kubectl autoscale deployment <名称> --min=2 --max=10 --cpu-percent=70 -n <命名空间>\nkubectl get hpa -n <命名空间>",
+  "note": "较新版本 kubectl 中 --cpu-percent 改为 --cpu=70%"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "手动触发 CronJob",
+  "code": "kubectl create job --from=cronjob/<cronjob名> <cronjob名>-manual -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "暂停 / 恢复 CronJob",
+  "code": "kubectl patch cronjob <名称> -n <命名空间> --type=merge -p '{\"spec\":{\"suspend\":true}}'",
+  "note": "改成 false 即恢复。Windows PowerShell 5.1 会吃掉引号，请用 PowerShell 7，或把补丁写进文件后用 --patch-file"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看 Job / CronJob",
+  "code": "kubectl get jobs,cronjobs -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "添加 / 删除标签和注解",
+  "code": "kubectl label pod <pod名> env=test -n <命名空间>\nkubectl label pod <pod名> env- -n <命名空间>\nkubectl annotate deployment <名称> owner=ops -n <命名空间>",
+  "note": "键名后加 - 表示删除"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "在线编辑资源",
+  "code": "kubectl edit deployment <名称> -n <命名空间>",
+  "note": "Windows 上可设置环境变量 KUBE_EDITOR=\"code --wait\" 用 VS Code 编辑"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "运行一个临时 Pod",
+  "code": "kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- sh",
+  "note": "退出 shell 后 Pod 自动删除"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "Pod 与本机之间拷贝文件",
+  "code": "kubectl cp <命名空间>/<pod名>:/app/app.log ./app.log\nkubectl cp ./a.txt <命名空间>/<pod名>:/tmp/a.txt",
+  "note": "容器内需要有 tar；多容器加 -c <容器名>"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "等待 Pod 就绪",
+  "code": "kubectl wait --for=condition=Ready pod -l app=<应用名> -n <命名空间> --timeout=120s",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "端口转发到 Pod / Deployment",
+  "code": "kubectl port-forward pod/<pod名> 5432:5432 -n <命名空间>\nkubectl port-forward deploy/<名称> 8080:8080 -n <命名空间>",
+  "note": "加 --address 0.0.0.0 可让局域网访问"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "从文件创建 ConfigMap",
+  "code": "kubectl create configmap app-config --from-file=config.yaml --from-literal=LOG_LEVEL=info -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "更新已有的 ConfigMap",
+  "code": "kubectl create configmap app-config --from-file=config.yaml -n <命名空间> --dry-run=client -o yaml | kubectl apply -f -",
+  "note": "以环境变量方式引用时需要重启 Pod 才生效"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "创建 Secret",
+  "code": "kubectl create secret generic app-secret --from-literal=password=<密码> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看 Secret 明文",
+  "code": "kubectl get secret app-secret -n <命名空间> -o jsonpath=\"{.data.password}\" | base64 -d",
+  "note": "PowerShell：[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String((kubectl get secret app-secret -n <命名空间> -o jsonpath=\"{.data.password}\")))"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "创建镜像拉取密钥",
+  "code": "kubectl create secret docker-registry regcred --docker-server=<仓库地址> --docker-username=<用户名> --docker-password=<密码> -n <命名空间>",
+  "note": "Pod 中通过 imagePullSecrets: [{name: regcred}] 引用"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "创建 TLS 证书 Secret",
+  "code": "kubectl create secret tls web-tls --cert=tls.crt --key=tls.key -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "节点停止调度 / 恢复调度",
+  "code": "kubectl cordon <节点名>\nkubectl uncordon <节点名>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "驱逐节点上的 Pod（维护前）",
+  "code": "kubectl drain <节点名> --ignore-daemonsets --delete-emptydir-data",
+  "note": "维护完成后 uncordon 恢复"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "添加 / 删除污点",
+  "code": "kubectl taint nodes <节点名> dedicated=gpu:NoSchedule\nkubectl taint nodes <节点名> dedicated=gpu:NoSchedule-",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "给节点打标签",
+  "code": "kubectl label nodes <节点名> disktype=ssd",
+  "note": "配合 nodeSelector 把 Pod 调度到指定节点"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看节点详情",
+  "code": "kubectl describe node <节点名>",
+  "note": "重点看 Conditions（压力状态）和 Allocated resources（已分配资源）"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "检查当前用户权限",
+  "code": "kubectl auth can-i create deployments -n <命名空间>\nkubectl auth can-i --list -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "检查 ServiceAccount 的权限",
+  "code": "kubectl auth can-i get pods --as=system:serviceaccount:<命名空间>:<sa名> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "创建 ServiceAccount 并授权",
+  "code": "kubectl create serviceaccount <sa名> -n <命名空间>\nkubectl create rolebinding <sa名>-view --clusterrole=view --serviceaccount=<命名空间>:<sa名> -n <命名空间>",
+  "note": "内置 ClusterRole：view、edit、admin、cluster-admin"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "为 ServiceAccount 生成临时 Token",
+  "code": "kubectl create token <sa名> -n <命名空间> --duration=1h",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看角色绑定",
+  "code": "kubectl get rolebindings,clusterrolebindings -A -o wide",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "合并多个 kubeconfig",
+  "code": "KUBECONFIG=~/.kube/config:~/new.yaml kubectl config view --flatten > merged.yaml",
+  "note": "PowerShell：$env:KUBECONFIG=\"$HOME\\.kube\\config;$HOME\\new.yaml\"（Windows 用分号分隔）"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "查看 kubeadm 证书有效期 / 续期",
+  "code": "sudo kubeadm certs check-expiration\nsudo kubeadm certs renew all",
+  "note": "续期后需重启控制面组件"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "生成加入集群的命令",
+  "code": "kubeadm token create --print-join-command",
+  "note": ""
+ },
+ {
+  "category": "Kubernetes",
+  "title": "bash 下的别名与自动补全",
+  "code": "source <(kubectl completion bash)\nalias k=kubectl\ncomplete -o default -F __start_kubectl k",
+  "note": "写入 ~/.bashrc 永久生效"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "常用效率工具",
+  "code": "k9s -n <命名空间>\nkubectx <上下文名>\nkubens <命名空间>\nstern <pod名前缀> -n <命名空间>",
+  "note": "k9s：终端图形界面；kubectx / kubens：快速切换；stern：同时跟踪多个 Pod 日志"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "本地集群：kind",
+  "code": "kind create cluster --name dev\nkind load docker-image myapp:1.0 --name dev\nkind delete cluster --name dev",
+  "note": "load 可把本地镜像直接放进集群，免推送仓库"
+ },
+ {
+  "category": "Kubernetes",
+  "title": "本地集群：minikube",
+  "code": "minikube start --driver=docker\nminikube service <服务名> --url\nminikube dashboard",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "Deployment 模板",
+  "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web\n  labels:\n    app: web\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: web\n  template:\n    metadata:\n      labels:\n        app: web\n    spec:\n      containers:\n        - name: web\n          image: nginx:1.27\n          ports:\n            - containerPort: 80\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              cpu: 500m\n              memory: 256Mi",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "Service 模板",
+  "code": "apiVersion: v1\nkind: Service\nmetadata:\n  name: web\nspec:\n  type: ClusterIP\n  selector:\n    app: web\n  ports:\n    - port: 80\n      targetPort: 80",
+  "note": "selector 要和 Pod 标签一致，否则 Endpoints 为空"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "Ingress 模板（ingress-nginx）",
+  "code": "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: web\nspec:\n  ingressClassName: nginx\n  tls:\n    - hosts: [web.example.com]\n      secretName: web-tls\n  rules:\n    - host: web.example.com\n      http:\n        paths:\n          - path: /\n            pathType: Prefix\n            backend:\n              service:\n                name: web\n                port:\n                  number: 80",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "健康检查探针",
+  "code": "livenessProbe:\n  httpGet:\n    path: /healthz\n    port: 8080\n  initialDelaySeconds: 10\n  periodSeconds: 10\nreadinessProbe:\n  httpGet:\n    path: /ready\n    port: 8080\n  periodSeconds: 5\nstartupProbe:\n  httpGet:\n    path: /healthz\n    port: 8080\n  failureThreshold: 30\n  periodSeconds: 10",
+  "note": "放在 containers 下；启动慢的应用用 startupProbe，避免被 liveness 误杀"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "ConfigMap 挂载为文件和环境变量",
+  "code": "# 容器内\nenvFrom:\n  - configMapRef:\n      name: app-config\nvolumeMounts:\n  - name: config\n    mountPath: /etc/app\n# Pod spec 下\nvolumes:\n  - name: config\n    configMap:\n      name: app-config",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "从 Secret 读取环境变量",
+  "code": "env:\n  - name: DB_PASSWORD\n    valueFrom:\n      secretKeyRef:\n        name: app-secret\n        key: password",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "PVC 模板",
+  "code": "apiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: data\nspec:\n  accessModes: [ReadWriteOnce]\n  storageClassName: <存储类>\n  resources:\n    requests:\n      storage: 10Gi",
+  "note": "不写 storageClassName 时使用默认存储类"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "CronJob 模板",
+  "code": "apiVersion: batch/v1\nkind: CronJob\nmetadata:\n  name: backup\nspec:\n  schedule: \"0 2 * * *\"\n  timeZone: Asia/Shanghai\n  concurrencyPolicy: Forbid\n  successfulJobsHistoryLimit: 3\n  failedJobsHistoryLimit: 3\n  jobTemplate:\n    spec:\n      backoffLimit: 2\n      template:\n        spec:\n          restartPolicy: OnFailure\n          containers:\n            - name: backup\n              image: busybox:1.36\n              command: [\"sh\", \"-c\", \"echo backup at $(date)\"]",
+  "note": "每天凌晨 2 点执行；timeZone 需要 K8s 1.27 及以上"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "Job 模板",
+  "code": "apiVersion: batch/v1\nkind: Job\nmetadata:\n  name: migrate\nspec:\n  backoffLimit: 3\n  ttlSecondsAfterFinished: 3600\n  template:\n    spec:\n      restartPolicy: Never\n      containers:\n        - name: migrate\n          image: myapp:1.0\n          command: [\"python\", \"manage.py\", \"migrate\"]",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "HPA 模板（autoscaling/v2）",
+  "code": "apiVersion: autoscaling/v2\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: web\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: Deployment\n    name: web\n  minReplicas: 2\n  maxReplicas: 10\n  metrics:\n    - type: Resource\n      resource:\n        name: cpu\n        target:\n          type: Utilization\n          averageUtilization: 70",
+  "note": "依赖 metrics-server，且容器必须设置 CPU requests"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "StatefulSet 模板",
+  "code": "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: db\nspec:\n  serviceName: db\n  replicas: 1\n  selector:\n    matchLabels:\n      app: db\n  template:\n    metadata:\n      labels:\n        app: db\n    spec:\n      containers:\n        - name: db\n          image: postgres:16\n          volumeMounts:\n            - name: data\n              mountPath: /var/lib/postgresql/data\n  volumeClaimTemplates:\n    - metadata:\n        name: data\n      spec:\n        accessModes: [ReadWriteOnce]\n        resources:\n          requests:\n            storage: 20Gi",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "DaemonSet 模板",
+  "code": "apiVersion: apps/v1\nkind: DaemonSet\nmetadata:\n  name: node-agent\nspec:\n  selector:\n    matchLabels:\n      app: node-agent\n  template:\n    metadata:\n      labels:\n        app: node-agent\n    spec:\n      tolerations:\n        - operator: Exists\n      containers:\n        - name: agent\n          image: busybox:1.36\n          command: [\"sh\", \"-c\", \"sleep infinity\"]",
+  "note": "每个节点运行一个；tolerations 允许调度到有污点的节点"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "调度：nodeSelector 与容忍",
+  "code": "nodeSelector:\n  disktype: ssd\ntolerations:\n  - key: dedicated\n    operator: Equal\n    value: gpu\n    effect: NoSchedule",
+  "note": ""
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "安全上下文（非 root 运行）",
+  "code": "securityContext:\n  runAsNonRoot: true\n  runAsUser: 10001\n  allowPrivilegeEscalation: false\n  readOnlyRootFilesystem: true\n  capabilities:\n    drop: [\"ALL\"]",
+  "note": "放在容器级别"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "NetworkPolicy：默认拒绝入站",
+  "code": "apiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: default-deny-ingress\nspec:\n  podSelector: {}\n  policyTypes: [Ingress]",
+  "note": "需要网络插件支持 NetworkPolicy（如 Calico、Cilium）"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "PodDisruptionBudget 模板",
+  "code": "apiVersion: policy/v1\nkind: PodDisruptionBudget\nmetadata:\n  name: web\nspec:\n  minAvailable: 1\n  selector:\n    matchLabels:\n      app: web",
+  "note": "节点维护（drain）时保证最少可用副本"
+ },
+ {
+  "category": "K8s YAML 模板",
+  "title": "initContainer 等待依赖就绪",
+  "code": "initContainers:\n  - name: wait-db\n    image: busybox:1.36\n    command: [\"sh\", \"-c\", \"until nc -z db 5432; do echo waiting; sleep 2; done\"]",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "安装或升级 Release",
+  "code": "helm upgrade --install <release> <chart> -n <命名空间> --create-namespace -f values.yaml",
+  "note": "先预览渲染结果：helm template <release> <chart> -f values.yaml"
+ },
+ {
+  "category": "Helm",
+  "title": "添加并更新仓库",
+  "code": "helm repo add bitnami https://charts.bitnami.com/bitnami\nhelm repo update\nhelm repo list",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "搜索 Chart",
+  "code": "helm search repo nginx\nhelm search repo nginx --versions\nhelm search hub nginx",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "列出 Release",
+  "code": "helm list -A",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "查看 Chart 默认配置",
+  "code": "helm show values bitnami/nginx > values.yaml",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "查看 Release 当前生效的配置",
+  "code": "helm get values <release> -n <命名空间> --all",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "查看 Release 生成的清单",
+  "code": "helm get manifest <release> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "查看历史并回滚",
+  "code": "helm history <release> -n <命名空间>\nhelm rollback <release> <版本号> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "卸载 Release",
+  "code": "helm uninstall <release> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "本地渲染模板",
+  "code": "helm template <release> <chart> -n <命名空间> -f values.yaml > rendered.yaml",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "试运行并输出调试信息",
+  "code": "helm upgrade --install <release> <chart> -n <命名空间> -f values.yaml --dry-run --debug",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "命令行覆盖单个值",
+  "code": "helm upgrade --install <release> <chart> -n <命名空间> --set image.tag=1.2.3 --set replicaCount=2",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "等待就绪，失败自动回滚",
+  "code": "helm upgrade --install <release> <chart> -n <命名空间> --wait --timeout 5m --atomic",
+  "note": "Helm 4 中 --atomic 更名为 --rollback-on-failure"
+ },
+ {
+  "category": "Helm",
+  "title": "创建、检查、打包 Chart",
+  "code": "helm create mychart\nhelm lint mychart\nhelm package mychart",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "更新 Chart 依赖",
+  "code": "helm dependency update mychart",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "下载 Chart 到本地",
+  "code": "helm pull bitnami/nginx --untar",
+  "note": ""
+ },
+ {
+  "category": "Helm",
+  "title": "使用 OCI 仓库",
+  "code": "helm registry login <仓库地址>\nhelm push mychart-0.1.0.tgz oci://<仓库地址>/charts\nhelm install <release> oci://<仓库地址>/charts/mychart --version 0.1.0",
+  "note": ""
+ },
+ {
+  "category": "Podman",
+  "title": "Podman 基本用法（兼容 docker）",
+  "code": "podman ps -a\npodman run -d --name web -p 8080:80 nginx:1.27\npodman logs -f web",
+  "note": "大部分 docker 命令把 docker 换成 podman 即可"
+ },
+ {
+  "category": "Podman",
+  "title": "Windows 上初始化 Podman 虚拟机",
+  "code": "podman machine init\npodman machine start\npodman machine list",
+  "note": ""
+ },
+ {
+  "category": "Podman",
+  "title": "创建 Pod 并加入容器",
+  "code": "podman pod create --name mypod -p 8080:80\npodman run -d --pod mypod nginx:1.27\npodman pod ps",
+  "note": ""
+ },
+ {
+  "category": "Podman",
+  "title": "导出 / 运行 Kubernetes YAML",
+  "code": "podman kube generate mypod > mypod.yaml\npodman kube play mypod.yaml\npodman kube down mypod.yaml",
+  "note": ""
+ },
+ {
+  "category": "Podman",
+  "title": "使用 Compose 文件",
+  "code": "podman compose up -d",
+  "note": "需要安装 podman-compose 或 docker-compose"
+ },
+ {
+  "category": "Podman",
+  "title": "登录镜像仓库",
+  "code": "podman login <仓库地址>",
+  "note": ""
+ },
+ {
+  "category": "Podman",
+  "title": "开机自启（Quadlet，Linux）",
+  "code": "# ~/.config/containers/systemd/web.container\n[Container]\nImage=docker.io/library/nginx:1.27\nPublishPort=8080:80\n\n[Install]\nWantedBy=default.target",
+  "note": "保存后执行 systemctl --user daemon-reload && systemctl --user start web；旧的 podman generate systemd 已不推荐"
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 查看容器、镜像、Pod",
+  "code": "crictl ps -a\ncrictl images\ncrictl pods",
+  "note": "K8s 节点上没有 docker 时使用"
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 查看日志",
+  "code": "crictl logs -f --tail 200 <容器ID>",
+  "note": ""
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 进入容器",
+  "code": "crictl exec -it <容器ID> sh",
+  "note": ""
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 查看容器详情",
+  "code": "crictl inspect <容器ID>",
+  "note": ""
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 拉取镜像",
+  "code": "crictl pull nginx:1.27",
+  "note": ""
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 清理未使用镜像",
+  "code": "crictl rmi --prune",
+  "note": ""
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "crictl 配置运行时地址",
+  "code": "crictl config runtime-endpoint unix:///run/containerd/containerd.sock",
+  "note": ""
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "ctr 查看 K8s 使用的镜像",
+  "code": "ctr -n k8s.io images ls",
+  "note": "K8s 的镜像在 k8s.io 命名空间里"
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "ctr 导入 / 导出镜像（离线节点）",
+  "code": "ctr -n k8s.io images import myapp.tar\nctr -n k8s.io images export myapp.tar docker.io/library/myapp:1.0",
+  "note": "tar 包可用 docker save 生成"
+ },
+ {
+  "category": "containerd / crictl",
+  "title": "nerdctl（docker 风格的 containerd 客户端）",
+  "code": "nerdctl --namespace k8s.io ps -a\nnerdctl run -d -p 8080:80 nginx:1.27",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "登录、打标签并推送镜像",
+  "code": "docker login <仓库地址>\ndocker tag myapp:1.0 <仓库地址>/<项目>/myapp:1.0\ndocker push <仓库地址>/<项目>/myapp:1.0",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "退出登录",
+  "code": "docker logout <仓库地址>",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "运行私有仓库 registry",
+  "code": "docker run -d -p 5000:5000 --name registry --restart always -v registry-data:/var/lib/registry registry:2",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "推送到本地私有仓库",
+  "code": "docker tag myapp:1.0 localhost:5000/myapp:1.0\ndocker push localhost:5000/myapp:1.0",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "查看私有仓库中的镜像和标签",
+  "code": "curl http://localhost:5000/v2/_catalog\ncurl http://localhost:5000/v2/myapp/tags/list",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "允许使用 HTTP 仓库",
+  "code": "{\n  \"insecure-registries\": [\"<仓库地址>:5000\"]\n}",
+  "note": "写入 daemon.json 后重启 Docker；仅建议内网测试使用"
+ },
+ {
+  "category": "镜像仓库",
+  "title": "skopeo 在仓库之间复制镜像",
+  "code": "skopeo copy docker://docker.io/library/nginx:1.27 docker://<仓库地址>/library/nginx:1.27",
+  "note": "不需要先拉到本地；多架构加 --all"
+ },
+ {
+  "category": "镜像仓库",
+  "title": "skopeo 查看远程镜像信息与标签",
+  "code": "skopeo inspect docker://docker.io/library/nginx:1.27\nskopeo list-tags docker://docker.io/library/nginx",
+  "note": ""
+ },
+ {
+  "category": "镜像仓库",
+  "title": "批量同步镜像到私有仓库",
+  "code": "for img in nginx:1.27 redis:7 postgres:16; do\n  docker pull $img\n  docker tag $img <仓库地址>/library/$img\n  docker push <仓库地址>/library/$img\ndone",
+  "note": "Linux shell 脚本；PowerShell 用 foreach ($img in \"nginx:1.27\",\"redis:7\") { ... }"
+ },
+ {
+  "category": "镜像仓库",
+  "title": "查看镜像 digest 并按 digest 拉取",
+  "code": "docker inspect -f \"{{index .RepoDigests 0}}\" nginx:1.27\ndocker pull nginx@sha256:<摘要>",
+  "note": "按 digest 拉取可保证镜像内容不变"
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看容器 IP",
+  "code": "docker inspect -f \"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}\" <容器名>",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看 / 创建网络",
+  "code": "docker network ls\ndocker network create mynet",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "指定子网创建网络",
+  "code": "docker network create --driver bridge --subnet 172.30.0.0/16 mynet2",
+  "note": "避免与公司内网网段冲突"
+ },
+ {
+  "category": "网络与存储",
+  "title": "容器加入自定义网络",
+  "code": "docker run -d --name api --network mynet myapp:1.0",
+  "note": "同一自定义网络内可以直接用容器名互相访问"
+ },
+ {
+  "category": "网络与存储",
+  "title": "运行中的容器连接 / 断开网络",
+  "code": "docker network connect mynet <容器名>\ndocker network disconnect mynet <容器名>",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看网络详情（含容器 IP）",
+  "code": "docker network inspect mynet",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "清理未使用的网络",
+  "code": "docker network prune -f",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "容器访问宿主机",
+  "code": "curl http://host.docker.internal:<端口>",
+  "note": "Docker Desktop 默认可用；Linux 需运行时加 --add-host host.docker.internal:host-gateway"
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看 / 创建数据卷",
+  "code": "docker volume ls\ndocker volume create mydata",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "挂载命名数据卷",
+  "code": "docker run -d -v mydata:/var/lib/postgresql/data postgres:16",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看数据卷详情",
+  "code": "docker volume inspect mydata",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "清理未使用的数据卷",
+  "code": "docker volume prune -f",
+  "note": "新版本默认只清理匿名卷，加 -a 清理全部未使用卷"
+ },
+ {
+  "category": "网络与存储",
+  "title": "备份数据卷",
+  "code": "docker run --rm -v mydata:/data -v ${PWD}:/backup alpine tar czf /backup/mydata.tar.gz -C /data .",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "恢复数据卷",
+  "code": "docker run --rm -v mydata:/data -v ${PWD}:/backup alpine sh -c \"cd /data && tar xzf /backup/mydata.tar.gz\"",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "K8s 服务的集群内域名",
+  "code": "<服务名>.<命名空间>.svc.cluster.local",
+  "note": "同命名空间内直接用 <服务名> 即可访问"
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看 Service 后端（Endpoints）",
+  "code": "kubectl get endpointslices -n <命名空间> -l kubernetes.io/service-name=<服务名>\nkubectl get endpoints <服务名> -n <命名空间>",
+  "note": "为空说明 selector 没匹配到就绪的 Pod"
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看 PV / PVC / 存储类",
+  "code": "kubectl get pv,pvc -A\nkubectl get storageclass",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看 Ingress",
+  "code": "kubectl get ingress -A\nkubectl describe ingress <名称> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "网络与存储",
+  "title": "查看 NetworkPolicy",
+  "code": "kubectl get networkpolicy -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "给 Pod 挂临时调试容器",
+  "code": "kubectl debug -it <pod名> -n <命名空间> --image=busybox:1.36 --target=<容器名>",
+  "note": "适用于镜像里没有 shell 或排查工具的情况"
+ },
+ {
+  "category": "排障调试",
+  "title": "按时间查看事件",
+  "code": "kubectl get events -n <命名空间> --sort-by=.lastTimestamp",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "只看 Warning 事件",
+  "code": "kubectl get events -A --field-selector type=Warning",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "查看上一次崩溃前的日志",
+  "code": "kubectl logs <pod名> -n <命名空间> --previous",
+  "note": "CrashLoopBackOff 时最有用"
+ },
+ {
+  "category": "排障调试",
+  "title": "同时查看多个 Pod 的日志",
+  "code": "kubectl logs -l app=<应用名> -n <命名空间> --all-containers --prefix --tail=100\nkubectl logs deploy/<名称> -n <命名空间>",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "CrashLoopBackOff 排查步骤",
+  "code": "kubectl describe pod <pod名> -n <命名空间>\nkubectl logs <pod名> -n <命名空间> --previous\nkubectl get pod <pod名> -n <命名空间> -o jsonpath=\"{.status.containerStatuses[*].lastState.terminated}\"",
+  "note": "常见原因：启动命令错误、配置缺失、依赖服务连不上、探针过严、内存不足（OOMKilled）"
+ },
+ {
+  "category": "排障调试",
+  "title": "ImagePullBackOff 排查步骤",
+  "code": "kubectl describe pod <pod名> -n <命名空间>\nkubectl get secret -n <命名空间>",
+  "note": "常见原因：镜像名或标签写错、私有仓库缺少 imagePullSecrets、节点访问不了仓库"
+ },
+ {
+  "category": "排障调试",
+  "title": "Pending 排查步骤",
+  "code": "kubectl describe pod <pod名> -n <命名空间>\nkubectl describe nodes | grep -A 8 \"Allocated resources\"\nkubectl get pvc -n <命名空间>",
+  "note": "常见原因：资源不足、nodeSelector / 污点不匹配、PVC 未绑定"
+ },
+ {
+  "category": "排障调试",
+  "title": "查看容器是否被 OOM",
+  "code": "kubectl get pod <pod名> -n <命名空间> -o jsonpath=\"{.status.containerStatuses[*].lastState.terminated.reason}\"",
+  "note": "输出 OOMKilled 时调大 limits.memory 或排查内存泄漏"
+ },
+ {
+  "category": "排障调试",
+  "title": "复制一个 Pod 来调试",
+  "code": "kubectl debug <pod名> -n <命名空间> -it --copy-to=<pod名>-debug --container=<容器名> -- sh",
+  "note": "不影响原 Pod；调试完记得删除副本"
+ },
+ {
+  "category": "排障调试",
+  "title": "调试节点",
+  "code": "kubectl debug node/<节点名> -it --image=busybox:1.36",
+  "note": "节点的文件系统挂载在 /host；用完删除生成的 Pod"
+ },
+ {
+  "category": "排障调试",
+  "title": "网络排查工具箱（netshoot）",
+  "code": "kubectl run netshoot --rm -it --image=nicolaka/netshoot -n <命名空间> -- bash\ndocker run -it --rm --network container:<容器名> nicolaka/netshoot",
+  "note": "内含 curl、dig、nslookup、tcpdump、iperf 等"
+ },
+ {
+  "category": "排障调试",
+  "title": "测试集群 DNS",
+  "code": "kubectl run dnstest --rm -it --image=busybox:1.36 --restart=Never -- nslookup kubernetes.default",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "测试服务连通性",
+  "code": "kubectl run curl --rm -it --image=curlimages/curl --restart=Never -- curl -sv http://<服务名>.<命名空间>.svc.cluster.local",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "在 Pod 中抓包",
+  "code": "kubectl debug -it <pod名> -n <命名空间> --image=nicolaka/netshoot --target=<容器名> -- tcpdump -i any port 8080",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "进入无 shell 容器的命名空间（Docker）",
+  "code": "docker run -it --rm --pid container:<容器名> --network container:<容器名> busybox sh",
+  "note": "共享目标容器的进程和网络，能看到它的进程和端口"
+ },
+ {
+  "category": "排障调试",
+  "title": "用 nsenter 进入容器网络（Linux 宿主机）",
+  "code": "PID=$(docker inspect -f \"{{.State.Pid}}\" <容器名>)\nsudo nsenter -t $PID -n ss -lntp",
+  "note": "可使用宿主机上的工具查看容器网络"
+ },
+ {
+  "category": "排障调试",
+  "title": "容器内常用排查命令",
+  "code": "cat /etc/resolv.conf\nnslookup <域名>\nwget -qO- http://<地址>:<端口>\nnc -zv <主机> <端口>\nenv | sort\ndf -h",
+  "note": "精简镜像可能缺少部分工具，可改用 netshoot 或 busybox"
+ },
+ {
+  "category": "排障调试",
+  "title": "查看资源上的 finalizers（卡在删除时）",
+  "code": "kubectl get <资源类型> <名称> -n <命名空间> -o jsonpath=\"{.metadata.finalizers}\"",
+  "note": "删除卡住多半是 finalizer 未完成，先查清是哪个控制器负责"
+ },
+ {
+  "category": "排障调试",
+  "title": "查看 Docker 容器启动失败原因",
+  "code": "docker ps -a --filter \"status=exited\"\ndocker logs <容器名>\ndocker inspect -f \"{{.State.Error}}\" <容器名>",
+  "note": ""
+ },
+ {
+  "category": "排障调试",
+  "title": "端口被占用（Linux）",
+  "code": "sudo ss -lntp | grep :8080",
+  "note": ""
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "查看 WSL 发行版与版本",
+  "code": "wsl -l -v",
+  "note": ""
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "关闭 WSL 释放内存",
+  "code": "wsl --shutdown",
+  "note": "Docker Desktop 占用内存过高时可用；会停止 Docker"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "限制 WSL 资源（.wslconfig）",
+  "code": "[wsl2]\nmemory=8GB\nprocessors=4\nswap=2GB",
+  "note": "文件位置：%UserProfile%\\.wslconfig，修改后执行 wsl --shutdown 生效"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "压缩 Docker Desktop 虚拟磁盘",
+  "code": "wsl --shutdown\nOptimize-VHD -Path \"$env:LOCALAPPDATA\\Docker\\wsl\\disk\\docker_data.vhdx\" -Mode Full",
+  "note": "需管理员 PowerShell 和 Hyper-V 模块；旧版本路径为 ...\\wsl\\data\\ext4.vhdx。先 docker system prune 效果更好"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "PowerShell 中命令换行",
+  "code": "docker run -d `\n  --name web `\n  -p 8080:80 `\n  nginx:1.27",
+  "note": "PowerShell 用反引号 `，CMD 用 ^，Linux shell 用 \\"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "PowerShell / CMD 挂载当前目录",
+  "code": "# PowerShell\ndocker run --rm -v \"${PWD}:/work\" -w /work alpine ls\n\n# CMD\ndocker run --rm -v \"%cd%:/work\" -w /work alpine ls",
+  "note": ""
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "PowerShell 中筛选输出",
+  "code": "kubectl get pods -A | Select-String \"Error|CrashLoop|Pending\"\ndocker ps | findstr nginx",
+  "note": "Select-String 相当于 grep；CMD 用 findstr"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "PowerShell 设置 kubectl 别名和补全",
+  "code": "Set-Alias -Name k -Value kubectl\nkubectl completion powershell | Out-String | Invoke-Expression",
+  "note": "写入 $PROFILE 后每次打开 PowerShell 自动生效（notepad $PROFILE）"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "PowerShell 循环操作容器",
+  "code": "docker ps -q | ForEach-Object { docker restart $_ }",
+  "note": ""
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "PowerShell 设置临时环境变量",
+  "code": "$env:KUBECONFIG = \"$HOME\\.kube\\dev.yaml\"\n$env:DOCKER_HOST = \"ssh://user@<主机>\"",
+  "note": "只对当前窗口有效"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "查看端口被哪个程序占用",
+  "code": "netstat -ano | findstr :8080\ntasklist /FI \"PID eq <PID>\"",
+  "note": "结束进程：taskkill /PID <PID> /F"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "在 WSL 中访问 Windows 文件",
+  "code": "cd /mnt/c/Users/<用户名>",
+  "note": "在 Windows 中访问 WSL 文件：资源管理器地址栏输入 \\\\wsl$"
+ },
+ {
+  "category": "Windows 与 WSL",
+  "title": "查看 Docker Desktop 版本与状态",
+  "code": "docker version\ndocker context ls",
+  "note": "context 为 desktop-linux 表示使用 Docker Desktop 的 Linux 引擎"
+ }
 ]
